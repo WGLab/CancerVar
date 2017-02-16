@@ -1,7 +1,7 @@
 ##################################################################################
 # Author: Li Quan (leequan@gmail.com)
 # Created Time: 2017-01-13 20:38:23 Friday 
-# File Name: intervarcan.py File type: python
+# File Name: CancerVar.py File type: python
 # Last Change:.
 # Description: python script for Interpretation of Pathogenetic of Cancer Variants
 ##################################################################################
@@ -9,11 +9,11 @@
 
 import string,copy,logging,os,io,re,time,sys,platform,optparse,gzip,csv
 
-prog="InterVarCan"
+prog="CancerVar"
 
 version = """%prog 0.1
 Copyright (C) 2017 Wang Genomic Lab
-InterVarCan is free for non-commercial use without warranty.
+CancerVar is free for non-commercial use without warranty.
 Please contact the authors for commercial use.
 Written by Quan LI,leequan@gmail.com.
 ============================================================================
@@ -24,14 +24,14 @@ usage = """Usage: %prog [OPTION] -i  INPUT -o  OUTPUT ...
 """
 
 description = """=============================================================================
-InterVarCan
+CancerVar
 Interpretation of Pathogenic/Benign for cancer variants using python script.
 =============================================================================
 """
 end = """=============================================================================
-Thanks for using InterVarCan!
+Thanks for using CancerVar!
 Report bugs to leequan@gmail.com;
-InterVarCan homepage: <https://InterVarCan.wglab.org>
+CancerVar homepage: <https://CancerVar.wglab.org>
 =============================================================================
 """
 
@@ -76,6 +76,8 @@ aa_changes_dict={}
 domain_benign_dict={}
 mim2gene_dict={}
 mim2gene_dict2={}
+morbidmap_dict={}
+morbidmap_dict2={}
 PP2_genes_dict={}
 BP1_genes_dict={}
 PS4_snps_dict={}
@@ -397,6 +399,26 @@ def read_datasets():
         fh.close()
 
 
+#4.morbidmap from OMIM  for BP5 ,  multifactorial disorders  list
+    try:
+        fh = open(paras['morbidmap'], "r")
+        strs = fh.read()
+        for line2 in strs.split('\n'):
+            cls2=line2.split('\t')
+            #print("%s %s %d" % (cls2[0], cls[Funcanno_flgs['Gene']], len(cls2[0])) )
+            #{Tuberculosis, protection against}, 607948 (3)|TIRAP, BACTS1|606252|11q24.2
+            if len(cls2[0])>1 and cls2[0].find('{')==0:  # disorder start with "{"
+                morbidmap_dict2[ cls2[2] ]='1'  # key as mim number
+                for cls3 in cls2[1].split(', '):
+                    keys=cls3.upper()
+                    morbidmap_dict[ keys ]='1'  # key as gene name
+    except IOError:
+        print("Error: can\'t read the OMIM morbidmap disorder file %s" % paras['morbidmap'])
+        print("Error: Please download it from http://www.omim.org/downloads")
+        sys.exit()
+    else:
+        fh.close()
+
 
 #5. read the user specified SNP list, the variants will pass the frequency check.
     if os.path.isfile(paras['exclude_snps']):
@@ -436,8 +458,6 @@ def read_datasets():
 
 
 #7. OMIM mim_pheno.txt file
-#mim_pheno = %(database_intervar)s/mim_pheno.txt
-#mim_orpha = %(database_intervar)s/mim_orpha.txt
 
     try:
         fh = open(paras['mim_pheno'], "r")
@@ -450,7 +470,7 @@ def read_datasets():
                 #print("%s %s" %(keys,mim_pheno_dict[keys]))
     except IOError:
         print("Error: can\'t read the MIM  file %s" % paras['mim_pheno'])
-        print("Error: Please download it from InterVarCan source website")
+        print("Error: Please download it from CancerVar source website")
         sys.exit()
     else:
         fh.close()
@@ -470,7 +490,7 @@ def read_datasets():
                 #print("%s %s" %(keys,mim_orpha_dict[keys]))
     except IOError:
         print("Error: can\'t read the MIM  file %s" % paras['mim_orpha'])
-        print("Error: Please download it from InterVarCan source website")
+        print("Error: Please download it from CancerVar source website")
         sys.exit()
     else:
         fh.close()
@@ -487,12 +507,12 @@ def read_datasets():
                 #print("%s %s" %(keys,mim_orpha_dict[keys]))
     except IOError:
         print("Error: can\'t read the Orpha  file %s" % paras['orpha'])
-        print("Error: Please download it from InterVarCan source website")
+        print("Error: Please download it from CancerVar source website")
         sys.exit()
     else:
         fh.close()
 
-#10 cancer_pathway=%(database_intervar)s/cancer_pathway.list
+#10 cancer_pathway=%(database_cancervar)s/cancer_pathway.list
     global cancer_pathway_dict
     try:
         fh = open(paras['cancer_pathway'], "r")
@@ -509,7 +529,7 @@ def read_datasets():
     else:
         fh.close()
 
-#11 cancers_genes=%(database_intervar)s/cancers_genes.list
+#11 cancers_genes=%(database_cancervar)s/cancers_genes.list
     global cancers_gene_dict
     try:
         fh = open(paras['cancers_genes'], "r")
@@ -1248,7 +1268,7 @@ def search_key_index(line,dict):
 
 def my_inter_var_can(annovar_outfile):
     newoutfile=annovar_outfile+".grl_p"
-    newoutfile2=annovar_outfile+".intervarcan"
+    newoutfile2=annovar_outfile+".cancervar"
 
     Freqs_flgs={'1000g2015aug_all':0,'esp6500siv2_all':0,'ExAC_ALL':0,'ExAC_AFR':0,'ExAC_AMR':0,'ExAC_EAS':0,'ExAC_FIN':0,'ExAC_NFE':0,'ExAC_OTH':0,'ExAC_SAS':0}
     Funcanno_flgs={'Func.refGene':0,'ExonicFunc.refGene':0,'AAChange.refGene':0,'Gene':0,'Gene damage prediction (all disease-causing genes)':0,'CLNDBN':0,'CLNACC':0,'CLNDSDB':0,'dbscSNV_ADA_SCORE':0,'dbscSNV_RF_SCORE':0,'GERP++_RS':0,'LoFtool_percentile':0,'Interpro_domain':0,'rmsk':0,'SIFT_score':0,'phyloP46way_placental':0,'Gene.ensGene':0,'CLINSIG':0,'CADD_raw':0,'CADD_phred':0,'avsnp144':0,'AAChange.ensGene':0,'AAChange.knownGene':0,'MetaSVM_score':0,'cosmic70':0,'ICGC_Id':0,'ICGC_Occurrence':0,'Otherinfo':0,'Polyphen2_HDIV_pred':0,'MetaLR_pred':0,'MutationTaster_pred':0,'FATHMM_pred':0}
@@ -1260,8 +1280,8 @@ def my_inter_var_can(annovar_outfile):
         fw=open(newoutfile2, "w")
         strs=fh.read()
         line_sum=0;
-        print("Notice: Begin the variants interpretation by InterVarCan ")
-        fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t InterVarCan: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp144","AAChange.ensGene","AAChange.refGene","Clinvar","InterVarCan and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phyloP46way_placental","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","rmsk","MetaSVM_score","Freq_ExAC_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha"  ))
+        print("Notice: Begin the variants interpretation by CancerVar ")
+        fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp144","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phyloP46way_placental","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","rmsk","MetaSVM_score","Freq_ExAC_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha"  ))
         for line in strs.split('\n'):
             BP="UNK" # the inter of pathogenetic/benign
             clinvar_bp="UNK"
@@ -1279,7 +1299,7 @@ def my_inter_var_can(annovar_outfile):
                     cls3=line_tmp2.split(';')
                     clinvar_bp=cls3[0]
 
-                intervar_bp=assign(BP,line,Freqs_flgs,Funcanno_flgs,Allels_flgs)
+                cancervar_bp=assign(BP,line,Freqs_flgs,Funcanno_flgs,Allels_flgs)
                 Freq_ExAC_POPs="AFR:"+cls[Freqs_flgs['ExAC_AFR']]+",AMR:"+cls[Freqs_flgs['ExAC_AMR']]+",EAS:"+cls[Freqs_flgs['ExAC_EAS']]+",FIN:"+cls[Freqs_flgs['ExAC_FIN']]+",NFE:"+cls[Freqs_flgs['ExAC_NFE']]+",OTH:"+cls[Freqs_flgs['ExAC_OTH']]+",SAS:"+cls[Freqs_flgs['ExAC_SAS']]
                 OMIM="."
                 mim2=mim2gene_dict2.get(cls[Funcanno_flgs['Gene']],".")
@@ -1306,8 +1326,8 @@ def my_inter_var_can(annovar_outfile):
 
 
 
-                fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t InterVarCan: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp144']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,intervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phyloP46way_placental']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['rmsk']],cls[Funcanno_flgs['MetaSVM_score']],Freq_ExAC_POPs,OMIM,Pheno_MIM,orpha,orpha_details   ))
-                #print("%s\t%s %s" % (line,clinvar_bp,intervar_bp))
+                fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp144']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phyloP46way_placental']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['rmsk']],cls[Funcanno_flgs['MetaSVM_score']],Freq_ExAC_POPs,OMIM,Pheno_MIM,orpha,orpha_details   ))
+                #print("%s\t%s %s" % (line,clinvar_bp,cancervar_bp))
 
             line_sum=line_sum+1
 
@@ -1353,12 +1373,12 @@ def main():
                   help="The input file type, it can be  AVinput(Annovar's format),VCF", metavar="AVinput")
 
     parser.add_option("-o", "--output", dest="output", action="store",
-                  help="The prefix of output file which contains the results, the file of results will be as [$$prefix].intervarcan ", metavar="example/myanno")
+                  help="The prefix of output file which contains the results, the file of results will be as [$$prefix].cancervar ", metavar="example/myanno")
 
 
-    group = optparse.OptionGroup(parser, "InterVarCan Other Options")
-    group.add_option("-t", "--database_intervarcan", dest="database_intervarcan", action="store",
-            help="The  database location/dir for the InterVarCan dataset files", metavar="intervarcandb")
+    group = optparse.OptionGroup(parser, "CancerVar Other Options")
+    group.add_option("-t", "--database_cancervar", dest="database_cancervar", action="store",
+            help="The  database location/dir for the CancerVar dataset files", metavar="cancervardb")
     group.add_option("-s", "--evidence_file", dest="evidence_file", action="store",
             help="User specified Evidence file for each variant", metavar="your_evidence_file")
     parser.add_option_group(group)
@@ -1383,8 +1403,8 @@ def main():
 
     parser.add_option_group(group)
     group = optparse.OptionGroup(parser, "Examples",
-                                """./InterVarCan.py -c config.ini  # Run the examples in config.ini
-                                 ./InterVarCan.py  -b hg19 -i your_input  --input_type=VCF  -o your_output
+                                """./CancerVar.py -c config.ini  # Run the examples in config.ini
+                                 ./CancerVar.py  -b hg19 -i your_input  --input_type=VCF  -o your_output
                                 """)
     parser.add_option_group(group)
 
@@ -1397,7 +1417,7 @@ def main():
 
     print("%s" %description)
     print("%s" %version)
-    print("Notice: Your command of InterVarCan is %s" % sys.argv[:])
+    print("Notice: Your command of CancerVar is %s" % sys.argv[:])
 
 
 
@@ -1408,7 +1428,7 @@ def main():
         for section in sections:
             ConfigSectionMap(config,section)
     else:
-        print("Error: The default configure file of [ config.ini ] is not exit! Please redownload the InterVarCan.")
+        print("Error: The default configure file of [ config.ini ] is not exit! Please redownload the CancerVar.")
         sys.exit()
 
 #begin to process user's options:
@@ -1434,9 +1454,9 @@ def main():
         paras['outfile']=options.output
     if options.evidence_file != None:
         paras['evidence_file']=options.evidence_file
-        print("Warning: You provided your own evidence file [ %s ] for the InterVar." % options.evidence_file)
-    if options.database_intervarcan != None:
-        paras['database_intervarcan']=options.database_intervarcan
+        print("Warning: You provided your own evidence file [ %s ] for the CancerVar." % options.evidence_file)
+    if options.database_cancervar != None:
+        paras['database_cancervar']=options.database_cancervar
 
     #paras['ps1_aa'] = paras['ps1_aa']+'.'+paras['buildver']
     #paras['ps4_snps'] = paras['ps4_snps']+'.'+paras['buildver']
@@ -1499,12 +1519,12 @@ def main():
         thefile.close( )
         print ("Notice: About %d lines in your input file %s " % (count,inputfile))
 
-    outfile=annovar_outfile+".intervar"
+    outfile=annovar_outfile+".cancervar"
     if os.path.isfile(outfile):
-        print ("Notice: About %d variants has been processed by InterVarCan" % (sum2-1))
-        print ("Notice: The InterVarCan is finished, the output file is [ %s.intervar ]" % annovar_outfile)
+        print ("Notice: About %d variants has been processed by CancerVar" % (sum2-1))
+        print ("Notice: The CancerVar is finished, the output file is [ %s.cancervar ]" % annovar_outfile)
     else:
-        print ("Warning: The InterVarCan seems not run correctly, please check your inputs and options in configure file")
+        print ("Warning: The CancerVar seems not run correctly, please check your inputs and options in configure file")
 
     print("%s" %end)
 
