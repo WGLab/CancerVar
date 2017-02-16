@@ -72,24 +72,12 @@ class myGzipFile(gzip.GzipFile):
 
 #begin read some important datsets/list firstly;
 lof_genes_dict={}
-aa_changes_dict={}
-domain_benign_dict={}
 mim2gene_dict={}
 mim2gene_dict2={}
-morbidmap_dict={}
-morbidmap_dict2={}
-PP2_genes_dict={}
-BP1_genes_dict={}
-PS4_snps_dict={}
 exclude_snps_dict={}
-mim_recessive_dict={}
-mim_domin_dict={}
-mim_adultonset_dict={}
 mim_pheno_dict={}
 mim_orpha_dict={}
 orpha_dict={}
-BS2_snps_recess_dict={}
-BS2_snps_domin_dict={}
 knownGeneCanonical_dict={}
 knownGeneCanonical_st_dict={}
 knownGeneCanonical_ed_dict={}
@@ -393,27 +381,6 @@ def read_datasets():
                 mim2gene_dict2[keys]=cls2[0]
     except IOError:
         print("Error: can\'t read the OMIM  file %s" % paras['mim2gene'])
-        print("Error: Please download it from http://www.omim.org/downloads")
-        sys.exit()
-    else:
-        fh.close()
-
-
-#4.morbidmap from OMIM  for BP5 ,  multifactorial disorders  list
-    try:
-        fh = open(paras['morbidmap'], "r")
-        strs = fh.read()
-        for line2 in strs.split('\n'):
-            cls2=line2.split('\t')
-            #print("%s %s %d" % (cls2[0], cls[Funcanno_flgs['Gene']], len(cls2[0])) )
-            #{Tuberculosis, protection against}, 607948 (3)|TIRAP, BACTS1|606252|11q24.2
-            if len(cls2[0])>1 and cls2[0].find('{')==0:  # disorder start with "{"
-                morbidmap_dict2[ cls2[2] ]='1'  # key as mim number
-                for cls3 in cls2[1].split(', '):
-                    keys=cls3.upper()
-                    morbidmap_dict[ keys ]='1'  # key as gene name
-    except IOError:
-        print("Error: can\'t read the OMIM morbidmap disorder file %s" % paras['morbidmap'])
         print("Error: Please download it from http://www.omim.org/downloads")
         sys.exit()
     else:
@@ -1500,7 +1467,7 @@ def main():
     print ("INFO: The options are %s " % paras)
     check_downdb()
     check_input()
-    check_annovar_result() #  to obtain myanno.hg19_multianno.csv
+    #check_annovar_result() #  to obtain myanno.hg19_multianno.csv
     annovar_outfile=paras['outfile']+"."+paras['buildver']+"_multianno.txt"
     read_datasets()
     #sum1=check_gdi_rvis_LOF(annovar_outfile)
