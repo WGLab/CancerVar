@@ -7,7 +7,7 @@
 ##################################################################################
 #!/usr/bin/env python
 
-import string,copy,logging,os,io,re,time,sys,platform,optparse,gzip,csv
+import string,copy,logging,os,io,re,time,sys,platform,optparse,gzip,csv,glob
 
 prog="CancerVar"
 
@@ -532,13 +532,11 @@ def check_downdb():
         print("Warning: the folder of %s is already created!" % path)
     ds=paras['database_names']
     ds.expandtabs(1);
-    # database_names = refGene 1000g2014oct esp6500siv2_all avsnp144 ljb26_all clinvar_20150629 exac03 hg19_dbscsnv11 dbnsfp31a_interpro rmsk ensGene
+    # database_names = refGene 1000g2014oct esp6500siv2_all avsnp147 ljb26_all clinvar_20150629 exac03 hg19_dbscsnv11 dbnsfp31a_interpro rmsk ensGene
 
     for dbs in ds.split():
         # os.path.isfile(options.table_annovar)
         file_name=dbs
-        if dbs=="1000g2014oct":
-            file_name="ALL.sites.2014_10"
         if dbs=="1000g2015aug":
             file_name="ALL.sites.2015_08"
 
@@ -548,31 +546,77 @@ def check_downdb():
         if dbs == 'rmsk':
             cmd="perl "+paras['annotate_variation']+" -buildver "+paras['buildver']+" -downdb "+file_name+" "+paras['database_locat']
         if  not os.path.isfile(dataset_file):
+            if dbs=="1000g2015aug":
+                file_name="1000g2015aug"
+                dataset_file=paras['database_locat']+"/"+paras['buildver']+"_"+file_name+".txt"
+                cmd="perl "+paras['annotate_variation']+" -buildver "+paras['buildver']+" -downdb -webfrom annovar "+file_name+" "+paras['database_locat']
             print("Warning: The Annovar dataset file of %s is not in %s,begin to download this %s ..." %(dbs,paras['database_locat'],dataset_file))
             print("%s" %cmd)
             os.system(cmd)
+    return
 
 def check_input():
     inputft= paras['inputfile_type']
     if inputft.lower() == 'avinput' :
         return
     if inputft.lower() == 'vcf':
+        if os.path.isfile(paras['convert2annovar']):
         #convert2annovar.pl -format vcf4 variantfile > variant.avinput
-        cmd="perl "+paras['convert2annovar']+" -format vcf4 "+ paras['inputfile']+"> "+paras['inputfile']+".avinput"
-        print("Warning: Begin to convert your vcf file of %s to AVinput of Annovar ..." % paras['inputfile'])
-        print("%s" %cmd)
-        os.system(cmd)
+            cmd="perl "+paras['convert2annovar']+" -format vcf4 "+ paras['inputfile']+"> "+paras['inputfile']+".avinput"
+            print("Warning: Begin to convert your vcf file of %s to AVinput of Annovar ..." % paras['inputfile'])
+            print("%s" %cmd)
+            os.system(cmd)
+        else:
+            print("Error: The Annovar file [ %s ] is not here,please download ANNOVAR firstly: http://www.openbioinformatics.org/annovar"
+                    % paras['convert2annovar'])
+            sys.exit()
+    if inputft.lower() == 'vcf_m':
+        if os.path.isfile(paras['convert2annovar']):
+        #convert2annovar.pl -format vcf4 variantfile > variant.avinput
+            cmd="perl "+paras['convert2annovar']+" -format vcf4 "+ paras['inputfile']+" --allsample   --outfile "+ paras['outfile']
+            print("Warning: Begin to convert your vcf file with multiple samples of %s to AVinput of Annovar with All.raw.highqc.vcf.<samplename>.avinput..." % paras['inputfile'])
+            print("Warning: Please attention that the sample names in VCF file should  contain letters/numners only, otherwise the converting may be failure!")
+            print("%s" %cmd)
+            os.system(cmd)
+        else:
+            print("Error: The Annovar file [ %s ] is not here,please download ANNOVAR firstly: http://www.openbioinformatics.org/annovar"
+                    % paras['convert2annovar'])
+            sys.exit()
     return
 
 def check_annovar_result():
 # table_annovar.pl example/ex1.avinput humandb/ -buildver hg19 -out myanno -remove -protocol refGene,esp6500siv2_all,1000g2015aug_all,avsnp144,ljb26_all,CLINSIG,exac03   -operation  g,f,f,f,f,f,f   -nastring . -csvout
     inputft= paras['inputfile_type']
+    annovar_options=" --otherinfo "
+    #if re.findall('true',paras['otherinfo'], flags=re.IGNORECASE)  :
+    #    annovar_options=annovar_options+"--otherinfo "
+    if re.findall('true',paras['onetranscript'], flags=re.IGNORECASE) :
+        annovar_options=annovar_options+"--onetranscript "
+
+    if not os.path.isfile(paras['table_annovar']):
+        print("Error: The Annovar file [ %s ] is not here,please download ANNOVAR firstly: http://www.openbioinformatics.org/annovar"
+                    % paras['table_annovar'])
+        sys.exit()
     if inputft.lower() == 'avinput' :
-        cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,rmsk,clinvar_20161128,cosmic70,icgc21  -operation  g,g,g,f,f,f,f,f,f,f,r,f,f,f   -nastring . --otherinfo"
-    else:
-        cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+".avinput "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+"  -protocol refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,rmsk,clinvar_20161128,cosmic70,icgc21  -operation  g,g,g,f,f,f,f,f,f,f,r,f,f,f  -nastring . --otherinfo"
-    print("%s" %cmd)
-    os.system(cmd)
+        #cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol refGene,esp6500siv2_all,1000g2015aug_all,avsnp147,dbnsfp30a,clinvar_20160302,exac03,dbscsnv11,dbnsfp31a_interpro,rmsk,ensGene,knownGene  -operation  g,f,f,f,f,f,f,f,f,r,g,g   -nastring ."+annovar_options
+        cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,rmsk,clinvar_20161128,cosmic70,icgc21  -operation  g,g,g,f,f,f,f,f,f,f,r,f,f,f  -nastring ."+annovar_options
+        print("%s" %cmd)
+        os.system(cmd)
+    if inputft.lower() == 'vcf' :
+        cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+".avinput "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol  refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,rmsk,clinvar_20161128,cosmic70,icgc21  -operation  g,g,g,f,f,f,f,f,f,f,r,f,f,f   -nastring ."+annovar_options
+        print("%s" %cmd)
+        os.system(cmd)
+    if inputft.lower() == 'vcf_m' :
+        for f in glob.iglob(paras['outfile']+"*.avinput"):
+            print("INFO: Begin to annotate sample file of %s ...." %(f))
+            new_outfile=re.sub(".avinput","",f)
+            cmd="perl "+paras['table_annovar']+" "+f+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ new_outfile +" -protocol  refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,rmsk,clinvar_20161128,cosmic70,icgc21  -operation  g,g,g,f,f,f,f,f,f,f,r,f,f,f    -nastring ."+annovar_options
+            print("%s" %cmd)
+            os.system(cmd)
+
+
+
+
     return
 
 def get_gdi_rvis_lof(gene_name,line_out,dicts,temple):
@@ -585,92 +629,6 @@ def get_gdi_rvis_lof(gene_name,line_out,dicts,temple):
     return(line_out)
 
 
-def check_gdi_rvis_LOF(anvfile):
-    gdi={}
-    rvis={}
-    lof={}
-    newoutfile=anvfile+".grl_p"
-# begin open file  and set dicts for gdi rvis and lof:
-    try:
-        fh = open(paras['gdi_file'], "r")
-        strs = fh.read()
-        for line in strs.split('\n'):
-            cls=line.split('\t')
-            if len(cls)>1:
-                gdi[cls[0]]=cls[1:]
-    except IOError:
-        print("Error: can\'t read the annovar output file %s" % paras['gdi_file'])
-        sys.exit()
-        return
-    else:
-        pass
-        fh.close()
-
-    try:
-        fh = open(paras['rvis_file'], "r")
-        strs = fh.read()
-        for line in strs.split('\n'):
-            cls=line.split('\t')
-            rvis['Gene']=['RVIS_ExAC_0.05%(AnyPopn)','%RVIS_ExAC_0.05%(AnyPopn)']
-            if len(cls)>1:
-                rvis[cls[4]]=cls[5:]
-    except IOError:
-        print("Error: can\'t read the annovar output file %s" % paras['rvis_file'])
-        sys.exit()
-        return
-    else:
-        pass
-        fh.close()
-
-    try:
-        fh = open(paras['lof_file'], "r")
-        strs = fh.read()
-        for line in strs.split('\n'):
-            cls=line.split('\t')
-            if len(cls)>1:
-                lof[cls[0]]=cls[1:]
-    except IOError:
-        print("Error: can\'t read the annovar output file %s" % paras['lof_file'])
-        sys.exit()
-        return
-    else:
-        pass
-        fh.close()
-
-    try:
-        fh = open(anvfile, "r")
-        fw = open(newoutfile, "w")
-        strs = fh.read()
-        sum=0
-        for line in strs.split('\n'):
-            cls=line.split('\t')
-            if len(cls)>1:
-                gene_name=cls[6]
-                if cls[6] == 'Gene.refGene':
-                    gene_name='Gene'
-#some with multiple genes, so one gene by one gene  to annote
-                gdi_temp=['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.']
-                rvis_temp=['.', '.']
-                lof_temp=['.']
-                sum=sum+1
-                for gg in gene_name.split(','):
-                    line_out=line+"\t"+gg
-                    line_out=get_gdi_rvis_lof(gg,line_out,gdi,gdi_temp)
-                    line_out=get_gdi_rvis_lof(gg,line_out,rvis,rvis_temp)
-                    line_out=get_gdi_rvis_lof(gg,line_out,lof,lof_temp)
-                    fw.write("%s\n" % line_out)
-
-#        fh.write("This is my test file for exception handling!!")
-    except IOError:
-        print("Error: can\'t read/write the annovar output file %s %s" % (anvfile,newoutfile))
-        sys.exit()
-        return
-    else:
-        pass
-        fh.close()
-        fw.close()
-
-    return(sum)
 
 def check_genes(anvfile):
 #check with multiple genes, so one gene by one gene  to annote
@@ -680,18 +638,31 @@ def check_genes(anvfile):
         fw = open(newoutfile, "w")
         strs = fh.read()
         sum=0
+        otherinf_pos=1
         for line in strs.split('\n'):
             cls=line.split('\t')
             if len(cls)>1:
+                if sum==0 and re.findall('true',paras['otherinfo'], flags=re.IGNORECASE) :
+                    for ii in range(0,len(cls)):
+                        if  re.findall('otherinfo',cls[ii], flags=re.IGNORECASE) :
+                            otherinf_pos=ii
+
                 gene_name=cls[6]
                 if cls[6] == 'Gene.refGene':
                     gene_name='Gene'
 #some with multiple genes, so one gene by one gene  to annote
                 sum=sum+1
                 for gg in gene_name.split(','):
-                    line_out=re.sub("^[Cc][Hh][Rr]","",line)+"\t"+gg
-                    #line_out=line+"\t"+gg
-                    # re.sub("[Cc][Hh][Rr]","",keys)
+                    if not re.findall('true',paras['otherinfo'], flags=re.IGNORECASE) :
+                        line_out=line+"\t"+gg
+                    else:
+                        line_out=cls[0]
+                        for ii in range(1,len(cls)):
+                            if ii != otherinf_pos :
+                                line_out=line_out+"\t"+cls[ii]
+                            if ii == otherinf_pos :
+                                line_out=line_out+"\t"+gg+"\t"+cls[ii]
+                    if sum >1: line_out=re.sub("^[Cc][Hh][Rr]","",line_out)
                     fw.write("%s\t\n" % line_out)
 
     except IOError:
@@ -751,8 +722,16 @@ def check_Thera(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     cls=line.split('\t')
     clstt=cls[Funcanno_flgs['Otherinfo']].split(';')
     cancer_type="CANCER"
-    if (len(clstt[0])>0):
-        cancer_type=clstt[0]
+    #if (len(clstt[0])>0):
+    #    cancer_type=clstt[0]
+    try:
+        cancer_type=paras['cancer_type']
+    except KeyError:
+        if (len(clstt[0])>0): cancer_type=clstt[0]
+    else:
+        pass
+ 
+
     gene_tr=cls[Funcanno_flgs['Gene']]
     func=cls[Funcanno_flgs['Func.refGene']]
     exonfunc=cls[Funcanno_flgs['Func.refGene']]
@@ -1238,7 +1217,7 @@ def my_inter_var_can(annovar_outfile):
     newoutfile2=annovar_outfile+".cancervar"
 
     Freqs_flgs={'1000g2015aug_all':0,'esp6500siv2_all':0,'ExAC_ALL':0,'ExAC_AFR':0,'ExAC_AMR':0,'ExAC_EAS':0,'ExAC_FIN':0,'ExAC_NFE':0,'ExAC_OTH':0,'ExAC_SAS':0}
-    Funcanno_flgs={'Func.refGene':0,'ExonicFunc.refGene':0,'AAChange.refGene':0,'Gene':0,'Gene damage prediction (all disease-causing genes)':0,'CLNDBN':0,'CLNACC':0,'CLNDSDB':0,'dbscSNV_ADA_SCORE':0,'dbscSNV_RF_SCORE':0,'GERP++_RS':0,'LoFtool_percentile':0,'Interpro_domain':0,'rmsk':0,'SIFT_score':0,'phyloP46way_placental':0,'Gene.ensGene':0,'CLINSIG':0,'CADD_raw':0,'CADD_phred':0,'avsnp144':0,'AAChange.ensGene':0,'AAChange.knownGene':0,'MetaSVM_score':0,'cosmic70':0,'ICGC_Id':0,'ICGC_Occurrence':0,'Otherinfo':0,'Polyphen2_HDIV_pred':0,'MetaLR_pred':0,'MutationTaster_pred':0,'FATHMM_pred':0}
+    Funcanno_flgs={'Func.refGene':0,'ExonicFunc.refGene':0,'AAChange.refGene':0,'Gene':0,'Gene damage prediction (all disease-causing genes)':0,'CLNDBN':0,'CLNACC':0,'CLNDSDB':0,'dbscSNV_ADA_SCORE':0,'dbscSNV_RF_SCORE':0,'GERP++_RS':0,'LoFtool_percentile':0,'Interpro_domain':0,'rmsk':0,'SIFT_score':0,'phyloP46way_placental':0,'Gene.ensGene':0,'CLINSIG':0,'CADD_raw':0,'CADD_phred':0,'avsnp147':0,'AAChange.ensGene':0,'AAChange.knownGene':0,'MetaSVM_score':0,'cosmic70':0,'ICGC_Id':0,'ICGC_Occurrence':0,'Otherinfo':0,'Polyphen2_HDIV_pred':0,'MetaLR_pred':0,'MutationTaster_pred':0,'FATHMM_pred':0,'Otherinfo':0}
     Allels_flgs={'Chr':0,'Start':0,'End':0,'Ref':0,'Alt':0}
 # ExAC_ALL esp6500siv2_all   1000g2015aug_all  SIFT_score    CADD_raw    CADD_phred  GERP++_RS   phyloP46way_placental  dbscSNV_ADA_SCORE   dbscSNV_RF_SCORE   Interpro_domain
 
@@ -1248,7 +1227,10 @@ def my_inter_var_can(annovar_outfile):
         strs=fh.read()
         line_sum=0;
         print("Notice: Begin the variants interpretation by CancerVar ")
-        fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp144","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phyloP46way_placental","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","rmsk","MetaSVM_score","Freq_ExAC_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha"  ))
+        if re.findall('true',paras['otherinfo'], flags=re.IGNORECASE)  :
+            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phyloP46way_placental","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","rmsk","MetaSVM_score","Freq_ExAC_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha","Otherinfo"  ))
+        else:
+            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phyloP46way_placental","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","rmsk","MetaSVM_score","Freq_ExAC_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha"  ))
         for line in strs.split('\n'):
             BP="UNK" # the inter of pathogenetic/benign
             clinvar_bp="UNK"
@@ -1292,8 +1274,10 @@ def my_inter_var_can(annovar_outfile):
                     orpha_details="."
 
 
-
-                fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp144']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phyloP46way_placental']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['rmsk']],cls[Funcanno_flgs['MetaSVM_score']],Freq_ExAC_POPs,OMIM,Pheno_MIM,orpha,orpha_details   ))
+                if re.findall('true',paras['otherinfo'], flags=re.IGNORECASE)  :
+                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phyloP46way_placental']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['rmsk']],cls[Funcanno_flgs['MetaSVM_score']],Freq_ExAC_POPs,OMIM,Pheno_MIM,orpha,orpha_details,cls[Funcanno_flgs['Otherinfo']]     ))
+                else:
+                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phyloP46way_placental']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['rmsk']],cls[Funcanno_flgs['MetaSVM_score']],Freq_ExAC_POPs,OMIM,Pheno_MIM,orpha,orpha_details   ))
                 #print("%s\t%s %s" % (line,clinvar_bp,cancervar_bp))
 
             line_sum=line_sum+1
@@ -1337,7 +1321,10 @@ def main():
                   help="The input file contains your variants", metavar="example/ex1.avinput")
 
     parser.add_option("--input_type", dest="input_type", action="store",
-                  help="The input file type, it can be  AVinput(Annovar's format),VCF", metavar="AVinput")
+                  help="The input file type, it can be  AVinput(Annovar's format),VCF(VCF with single sample),VCF_m(VCF with multiple samples)", metavar="AVinput")
+
+    parser.add_option("--cancer_type", dest="cancer_type", action="store",
+                  help="The cancer type, please check the doc for the details of cancer tyoe)", metavar="CANCER")
 
     parser.add_option("-o", "--output", dest="output", action="store",
                   help="The prefix of output file which contains the results, the file of results will be as [$$prefix].cancervar ", metavar="example/myanno")
@@ -1351,10 +1338,9 @@ def main():
     parser.add_option_group(group)
     group = optparse.OptionGroup(parser, "   How to add your own Evidence for each Variant",
     """ Prepare your own evidence  file as tab-delimited,the line format:
-         (The code for additional evidence should be as: PS5/PM7/PP6/BS5/BP8 ;
          The format for upgrad/downgrade of criteria should be like: grade_PS1=2;
          1 for Strong; 2 for Moderate; 3 for Supporting)
-            Chr Pos Ref_allele Alt_allele  PM1=1;BS2=1;BP3=0;PS5=1;grade_PM1=1
+            Chr Pos Ref_allele Alt_allele  Evidence_list
                                 """)
     parser.add_option_group(group)
 
@@ -1370,8 +1356,8 @@ def main():
 
     parser.add_option_group(group)
     group = optparse.OptionGroup(parser, "Examples",
-                                """./CancerVar.py -c config.ini  # Run the examples in config.ini
-                                 ./CancerVar.py  -b hg19 -i your_input  --input_type=VCF  -o your_output
+    """./CancerVar.py -c config.ini  # Run the examples in config.ini
+    ./CancerVar.py -i your_input  --input_type=VCF  -o your_output
                                 """)
     parser.add_option_group(group)
 
@@ -1422,8 +1408,21 @@ def main():
     if options.evidence_file != None:
         paras['evidence_file']=options.evidence_file
         print("Warning: You provided your own evidence file [ %s ] for the CancerVar." % options.evidence_file)
+    if options.cancer_type != None:
+        paras['cancer_type']=options.cancer_type
     if options.database_cancervar != None:
         paras['database_cancervar']=options.database_cancervar
+        paras['lof_genes'] = paras['database_cancervar']+'/PVS1.LOF.genes'
+        paras['mim2gene'] =paras['database_cancervar']+'/mim2gene.txt'
+        paras['mim_pheno'] = paras['database_cancervar']+'/mim_pheno.txt'
+        paras['mim_orpha'] = paras['database_cancervar']+'/mim_orpha.txt'
+        paras['orpha'] = paras['database_cancervar']+'/orpha.txt'
+        paras['knowngenecanonical'] = paras['database_cancervar']+'/knownGeneCanonical.txt'
+        paras['exclude_snps'] = paras['database_cancervar']+'/ext.variants'
+        paras['cgi_markers'] =paras['database_cancervar']+'/cgi_biomarkers_20170103.txt'
+        paras['add_markers'] =paras['database_cancervar']+'/add_marker.full.txt'
+        paras['cancer_pathway'] =paras['database_cancervar']+'/cancer_pathway.list'
+        paras['cancers_genes'] =paras['database_cancervar']+'/cancers_genes.list'
 
     #paras['ps1_aa'] = paras['ps1_aa']+'.'+paras['buildver']
     #paras['ps4_snps'] = paras['ps4_snps']+'.'+paras['buildver']
@@ -1465,33 +1464,43 @@ def main():
 
 
     print ("INFO: The options are %s " % paras)
+    try:
+        print("Warning: Your specified the cancer type: %s in command, the cancer type in otherinfo column will be replaced for all your variants!!!" % paras['cancer_type'])
+    except KeyError:
+        pass
+    else:
+        pass
+
     check_downdb()
     check_input()
     #check_annovar_result() #  to obtain myanno.hg19_multianno.csv
-    annovar_outfile=paras['outfile']+"."+paras['buildver']+"_multianno.txt"
     read_datasets()
-    #sum1=check_gdi_rvis_LOF(annovar_outfile)
-    sum1=check_genes(annovar_outfile)
-    sum2=my_inter_var_can(annovar_outfile)
+    inputft= paras['inputfile_type']
+    some_file_fail=0
+    for annovar_outfile  in glob.iglob(paras['outfile']+"*."+paras['buildver']+"_multianno.txt"):
+        print("annovar_outfile is %s" % annovar_outfile)
+        sum1=check_genes(annovar_outfile)
+        sum2=my_inter_var_can(annovar_outfile)
 
-    inputfile=paras['inputfile']
-    if os.path.isfile(inputfile):
-        count = 0
-        thefile = open(inputfile, 'rb')
-        while True:
-            buffer = thefile.read(8192*1024)
-            if not buffer:
-                break
-            count += buffer.count('\n')
-        thefile.close( )
-        print ("Notice: About %d lines in your input file %s " % (count,inputfile))
+        outfile=annovar_outfile+".cancervar"
+        if os.path.isfile(outfile):
+            print ("Notice: About %d lines in your variant file! " % (sum1-1))
+            print ("Notice: About %d variants has been processed by CancerVar" % (sum2-1))
+            if inputft.lower() != 'vcf_m' :
+                print ("Notice: The CancerVar is finished, the output file is [ %s.cancervar ]" % annovar_outfile)
+        else:
+            some_file_fail=some_file_fail+1
+            print ("Warning: The CancerVar seems not run correctly, please check your inputs and options in configure file")
 
-    outfile=annovar_outfile+".cancervar"
-    if os.path.isfile(outfile):
-        print ("Notice: About %d variants has been processed by CancerVar" % (sum2-1))
-        print ("Notice: The CancerVar is finished, the output file is [ %s.cancervar ]" % annovar_outfile)
-    else:
-        print ("Warning: The CancerVar seems not run correctly, please check your inputs and options in configure file")
+    if inputft.lower() == 'vcf_m' :
+        print ("Notice: The CancerVar for VCF with multiple samples is finished, the output file is as [ %s.<samplename>.cancervar ]" % annovar_outfile)
+        sum_sample=1;
+        for f in glob.iglob(paras['outfile']+"*."+paras['buildver']+"_multianno.txt.cancervar"):
+            print ("Notice: The CancerVar for VCF with multiple samples is finished, The %d sample output file is [ %s]" %(sum_sample,f))
+            sum_sample=sum_sample+1;
+        if some_file_fail>=1:
+            print ("Warning: The CancerVar seems not run correctly for your %d samples in the VCF, please check your inputs and options in configure file" %  some_file_fail )
+
 
     print("%s" %end)
 
