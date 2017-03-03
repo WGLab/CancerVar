@@ -84,11 +84,13 @@ knownGeneCanonical_ed_dict={}
 
 add_markers_dict={}
 cgi_markers_dict={}
+civ_markers_dict={}
 cancer_pathway_dict={}
 cancers_gene_dict={}
 
 add_d=[]
 cgi_d=[]
+civ_d=[]
 
 def flip_ACGT(acgt):
     nt="";
@@ -364,9 +366,30 @@ def read_datasets():
         #print add_markers_dict
 # end deal with add_markers from pmkb
 
+#3. add_markers from civic
+    global civ_d
+    try:
+        with open(paras['civic_markers']) as fh:
+            reader = csv.reader(fh, delimiter="\t")
+            add_d = list(reader)
+#['Gene', 'Variants', 'Tumor(s)', 'Publications']
+# gene    entrez_id   variant disease doid    drugs   evidence_type   evidence_direction  evidence_level  clinical_significance   evidence_statement  pubmed_id   citation    rating  evidence_status evidence_id variant_id  gene_id chromosome  start   stop    reference_bases variant_bases   representative_transcript   chromosome2 start2  stop2   representative_transcript2  ensembl_version reference_build variant_summary variant_origin  evidence_civic_url  variant_civic_url   gene_civic_url  disease 'Code'
+
+    except IOError:
+        print("Error: can\'t read the additional markers file %s" % paras['civic_markers'])
+        print("Error: Please download it from the source website")
+        sys.exit()
+        return
+    else:
+        fh.close()
 
 
-#3. OMIM mim2gene.txt file
+
+
+
+# end deal with civ_markers from civic
+
+#4. OMIM mim2gene.txt file
     try:
         fh = open(paras['mim2gene'], "r")
         strs = fh.read()
@@ -1423,6 +1446,8 @@ def main():
         paras['add_markers'] =paras['database_cancervar']+'/add_marker.full.txt'
         paras['cancer_pathway'] =paras['database_cancervar']+'/cancer_pathway.list'
         paras['cancers_genes'] =paras['database_cancervar']+'/cancers_genes.list'
+        paras['civic_markers']=paras['database_cancervar']+'/civic_2017_02.txt'
+
 
     #paras['ps1_aa'] = paras['ps1_aa']+'.'+paras['buildver']
     #paras['ps4_snps'] = paras['ps4_snps']+'.'+paras['buildver']
@@ -1477,10 +1502,12 @@ def main():
     read_datasets()
     inputft= paras['inputfile_type']
     some_file_fail=0
+    out_annf=0;
     for annovar_outfile  in glob.iglob(paras['outfile']+"*."+paras['buildver']+"_multianno.txt"):
         print("annovar_outfile is %s" % annovar_outfile)
         sum1=check_genes(annovar_outfile)
         sum2=my_inter_var_can(annovar_outfile)
+        out_annf=out_annf+1;
 
         outfile=annovar_outfile+".cancervar"
         if os.path.isfile(outfile):
@@ -1500,9 +1527,13 @@ def main():
             sum_sample=sum_sample+1;
         if some_file_fail>=1:
             print ("Warning: The CancerVar seems not run correctly for your %d samples in the VCF, please check your inputs and options in configure file" %  some_file_fail )
-
-
+    if out_annf==0:
+         print ("Warning: The InterVar seems not run correctly, please check your inputs , options and configure file!")
+         print ("ERROR: The InterVar did not find the annotation result file from ANNOVAR!")
+         print ("ERROR: The name of annotation result file should be like %s*.%s__multianno.txt" % (paras['outfile'],paras['buildver']))
     print("%s" %end)
+
+
 
 
 
