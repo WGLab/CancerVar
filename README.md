@@ -48,8 +48,6 @@ version of reference genome: hg18, hg19(default)
 - -t cancervardb, --database_intervar=cancervardb
 The database location/dir for the CancerVar dataset files
 
-```
-
 - --table_annovar=./table_annovar.pl
 The Annovar perl script of table_annovar.pl
 
@@ -87,6 +85,11 @@ CancerVar is free for non-commercial use without warranty. Users need to obtain 
 Quan Li and Kai Wang. CancerVar: Clinical Interpretation of Cancer variants  by AMP/ASCO/CAP 2017 guidelines. (In preparation)
 
 Quan Li and Kai Wang. InterVar: Clinical interpretation of genetic variants by ACMG-AMP 2015 guideline. The American Journal of Human Genetics 100, 1-14, February 2, 2017,[http://dx.doi.org/10.1016/j.ajhg.2017.01.004](http://dx.doi.org/10.1016/j.ajhg.2017.01.004)
+
+[The  AMP/ASCO/CAP 2017 guidelines ](https://www.ncbi.nlm.nih.gov/pubmed/27993330)
+Li MM, Datto M, Duncavage EJ, Kulkarni S, Lindeman NI, Roy S, Tsimberidou AM, Vnencak-Jones CL, Wolff DJ, Younes A, Nikiforova MN.
+Standards and Guidelines for the Interpretation and Reporting of Sequence Variants in Cancer: A Joint Consensus Recommendation of the Association for Molecular Pathology, American Society of Clinical Oncology, and College of American Pathologists.
+
 
 [The ACMG 2015 guide](http://www.ncbi.nlm.nih.gov/pubmed/25741868)
 Richards, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genetics in medicine : official journal of the American College of Medical Genetics 17, 405-424 (2015).
