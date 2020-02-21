@@ -12,7 +12,8 @@ import string,copy,logging,os,io,re,time,sys,platform,optparse,gzip,csv,glob
 prog="CancerVar"
 
 version = """%prog 1.1
-Copyright (C) 2019 Wang Genomic Lab
+relase 20200119
+Copyright (C) 2020 Wang Genomic Lab
 CancerVar is free for non-commercial use without warranty.
 Please contact the authors for commercial use.
 Written by Quan LI,leequan@gmail.com.
@@ -33,7 +34,7 @@ usage = """Usage: %prog [OPTION] -i  INPUT -o  OUTPUT ...
 
 description = """=============================================================================
 CancerVar
-Interpretation of Pathogenic/Benign for cancer variants using python script.
+Interpretation of Pathogenic/Benign for cancer variants (v.1.1)
 =============================================================================
 ........................................................................
 ..%%%%....%%%%...%%..%%...%%%%...%%%%%%..%%%%%...%%..%%...%%%%...%%%%%..
@@ -105,9 +106,7 @@ knownGeneCanonical_dict={}
 knownGeneCanonical_st_dict={}
 knownGeneCanonical_ed_dict={}
 
-add_markers_dict={}
 cancervar_markers_dict={}
-civ_markers_dict={}
 cancer_pathway_dict={}
 cancers_gene_dict={}
 cancers_types_dict={}
@@ -181,10 +180,9 @@ def read_datasets():
         fh.close()
 
         
-        print len(cancervar_d)
+        #print len(cancervar_d)
         for ii in range(0,len(cancervar_d)):
             gene=cancervar_d[ii][0]
-            #print ii,gene
             mut_type=cancervar_d[ii][1]
             mut=cancervar_d[ii][2]
             mut_types=mut_type.split(';');  # BIA CNA EXPR FUS MUT
@@ -198,13 +196,11 @@ def read_datasets():
                 else:
                     gene1=gene
                     mutb=mut_alts[jj]
-                    #print ii,gene1,mutb
                 if(mut_types[jj]=="FUS"):                    
                     mutt="fus_"+re.sub('__','-',mut_alts[jj])
                     key=mutt
                     default_s=''
                     cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                    #print key,ii,cancervar_markers_dict[key]
                 elif(mut_types[jj]=="EXP" or mut_types[jj]=="EXPR"):                    
                     mutt=gene1+"_"+"expr_"+mutb
                     key=mutt
@@ -232,7 +228,6 @@ def read_datasets():
                         key=gene+'_'+mutt
                         default_s=''
                         cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                        #print key,ii,cancervar_markers_dict[key]
                     elif(mutb=="any insertion"): 
                         mutt="insertion_any"
                         key=gene+'_'+mutt
@@ -283,7 +278,6 @@ def read_datasets():
                         key=gene+'_'+mutt
                         default_s=''
                         cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                        #print key,ii,cancervar_markers_dict[key]
                     elif(mutb=="any nonsense"): 
                         mutt="nonsense_any"
                         key=gene+'_'+mutt
@@ -292,7 +286,6 @@ def read_datasets():
 
                     # format as " exon(s) 10, 20, 21 any"
                     elif(  re.findall('exon\(s\) ', mutb, flags=re.IGNORECASE)):
-                    #print("exon(s) ");
                         str1,str2=mutb.split('exon(s) ',1);
                         if( not  re.findall(',', mutb, flags=re.IGNORECASE)): # for single position
                             poss,mutc=str2.split(' ',1);
@@ -302,7 +295,6 @@ def read_datasets():
                             key=gene+'_'+muts
                             default_s=''
                             cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                            #print key,ii,cancervar_markers_dict[key]
                         else: # for multiple positions
                             list_pos=str2.split(',');
                             list_pos_size=len(list_pos)
@@ -317,7 +309,6 @@ def read_datasets():
                             key=gene+'_'+muts
                             default_s=''
                             cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                            #print key,ii,add_markers_dict[key]
                             for jj in range(0,list_pos_size-1):
                                 pos_be=str(int(list_pos[jj]))
                                 if(mutc=="mutation"): mutc="any"
@@ -328,7 +319,6 @@ def read_datasets():
                                 #print key,ii,cancervar_markers_dict[key]
                     # " codon(s) 289, 596, 598 any"   codon(s) 132 any
                     elif(  re.findall('codon\(s\) ', mutb, flags=re.IGNORECASE)):
-                        #print("codon(s) ");
                         str1,str2=mutb.split('codon(s) ',1);
                         if( not  re.findall(',', mutb, flags=re.IGNORECASE)): # for single position
                             poss,mutc=str2.split(' ',1);
@@ -338,7 +328,6 @@ def read_datasets():
                             key=gene+'_'+muts
                             default_s=''
                             cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                            #print key,ii,cancervar_markers_dict[key]
                         else: # for multiple positions
                             list_pos=str2.split(',');
                             list_pos_size=len(list_pos)
@@ -352,33 +341,25 @@ def read_datasets():
                             key=gene+'_'+muts
                             default_s=''
                             cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                            #print key,ii,add_markers_dict[key]
                             for jj in range(0,list_pos_size-1):
                                 pos_be=str(int(list_pos[jj]))
                                 muts="codon_"+pos_be+"_"+mutc
                                 key=gene+'_'+muts
                                 default_s=''
                                 cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                                #print key,ii,cancervar_markers_dict[key]
                     else:
                         mutt=gene1+"_"+mutb
                         key=mutt
                         default_s=''
                         cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                        #print key,ii,cancervar_markers_dict[key]
                 else:
                     key=gene1+"_"+mutb
                     default_s=''
                     cancervar_markers_dict[key]=str(ii)+","+cancervar_markers_dict.get(key,default_s)
-                    #print key,ii,cancervar_markers_dict[key]
                                         
                 
 #        print cancervar_markers_dict
 # end deal with cancervar_markers
-
-
-
-
 
 #4. OMIM mim2gene.txt file
     try:
@@ -429,7 +410,6 @@ def read_datasets():
                 knownGeneCanonical_dict[keys]=cls2[1]
                 knownGeneCanonical_st_dict[keys]=cls2[2]
                 knownGeneCanonical_ed_dict[keys]=cls2[3]
-                #print("%s %s" %(keys,knownGeneCanonical_dict[keys]))
     except IOError:
         print("Error: can\'t read the knownGeneCanonical  file %s" % paras['knowngenecanonical'])
         print("Error: Please download it from the source website")
@@ -448,7 +428,6 @@ def read_datasets():
             if len(cls2)>1:
                 keys=cls2[0]
                 mim_pheno_dict[keys]=cls2[1]
-                #print("%s %s" %(keys,mim_pheno_dict[keys]))
     except IOError:
         print("Error: can\'t read the MIM  file %s" % paras['mim_pheno'])
         print("Error: Please download it from CancerVar source website")
@@ -468,7 +447,6 @@ def read_datasets():
             if len(cls2)>1:
                 keys=cls2[0]
                 mim_orpha_dict[keys]=cls2[1]
-                #print("%s %s" %(keys,mim_orpha_dict[keys]))
     except IOError:
         print("Error: can\'t read the MIM  file %s" % paras['mim_orpha'])
         print("Error: Please download it from CancerVar source website")
@@ -485,7 +463,6 @@ def read_datasets():
             if len(cls2)>1:
                 keys=cls2[0]
                 orpha_dict[keys]=cls2[1]
-                #print("%s %s" %(keys,mim_orpha_dict[keys]))
     except IOError:
         print("Error: can\'t read the Orpha  file %s" % paras['orpha'])
         print("Error: Please download it from CancerVar source website")
@@ -537,7 +514,6 @@ def read_datasets():
             cls2=line2.split('/')
             if len(cls2)>1:
                 cancers_types_dict[cls2[1]]=cls2[0];
-                #print("%s %s" %(cls2[1],cls2[0]))
     except IOError:
         print("Error: can\'t read the cancers types file %s" % paras['cancers_types'])
         print("Error: Please download it from the source website")
@@ -717,7 +693,6 @@ def classfy(CBP,Allels_flgs,cls):
     # CBP[6]: Populatio(1100)  CBP[7]:Germline dat(2201) CBP[8]:Somatic dat(2100) CBP[9]:Predict_dama(2201) 
     # CBP[10]:  Path(2100)  CBP[11] : Pubs
 
-    #print("Before up/down grade, the sum of CBP %s, PM %s,PP %s,BS %s,BP %s" %(PS_sum,PM_sum,PP_sum,BS_sum,BP_sum));
     #begin process the user's flexible grade  to get the final interpretation
 
     if os.path.isfile(paras['evidence_file']):
@@ -742,27 +717,28 @@ def classfy(CBP,Allels_flgs,cls):
             pass
 
     # end process the user's flexible grade
-    if CBP[0]==2 and CBP[3]==1 and CBP[6]==1 and CBP[7]==2 and CBP[8]==2 and  CBP[9]==2 and  CBP[10]==2:
-        BPS_out=0
-    if CBP[0]==1 and CBP[3]==1 and CBP[6]==1 and CBP[7]==2 and CBP[8]>=1 and  CBP[9]==2 and  CBP[10]>=1:
-        BPS_out=1
+#this is old scoring, removed
+#    if CBP[0]==2 and CBP[3]==1 and CBP[6]==1 and CBP[7]==2 and CBP[8]==2 and  CBP[9]==2 and  CBP[10]==2:
+#        BPS_out=0
+#    if CBP[0]==1 and CBP[3]==1 and CBP[6]==1 and CBP[7]==2 and CBP[8]>=1 and  CBP[9]==2 and  CBP[10]>=1:
+#        BPS_out=1
 
-    if CBP[0]==0 and CBP[3]==0 and CBP[6]==0 and CBP[7]==0 and CBP[8]==0 and  CBP[9]==0 and  CBP[10]==0:
-        BPS_out=3
-    if CBP[0]==0 and CBP[3]==0 and CBP[6]==0 and CBP[7]>=0 and CBP[8]==0 and  CBP[9]<=1 and  CBP[10]==0:
-        BPS_out=2
+#    if CBP[0]==0 and CBP[3]==0 and CBP[6]==0 and CBP[7]==0 and CBP[8]==0 and  CBP[9]==0 and  CBP[10]==0:
+#        BPS_out=3
+#    if CBP[0]==0 and CBP[3]==0 and CBP[6]==0 and CBP[7]>=0 and CBP[8]==0 and  CBP[9]<=1 and  CBP[10]==0:
+#        BPS_out=2
 # EVS=[1, None, None, 1, None, None, 1, 2, 2, 2, 2, None]
 #     [1, None, None, 1, None, None, 1, 0, 1, 2, 2, None]
-    for i in range(0,11):
-        CBP_sum=CBP_sum+CBP[i]
-    if(CBP_sum<=3):  BPS_out=2 # benign
-    if(CBP_sum>3 and CBP_sum<8):  BPS_out=3 # VUS
-    if(CBP_sum>=8 and CBP_sum<=11):  BPS_out=1 # potential path
-    if(CBP_sum>=12):  BPS_out=0 # strong path
+
+#begin new scoring.
+    for i in range(0,12):        CBP_sum=CBP_sum+CBP[i]
+    if(CBP_sum<=2):  BPS_out=2 # benign
+    if(CBP_sum>=3 and CBP_sum<8):  BPS_out=3 # VUS
+    if(CBP_sum>=8 and CBP_sum<=10):  BPS_out=1 # potential path
+    if(CBP_sum>=11):  BPS_out=0 # strong path
 
 
-    #CBPout=BPS[BPS_out]
-    CBPout=str(CBP_sum)+"_"+BPS[BPS_out]
+    CBPout=str(CBP_sum)+"#"+BPS[BPS_out]
     return(CBPout)
 
 
@@ -784,6 +760,7 @@ def check_Thera(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     cls=line.split('\t')
     clstt=cls[Funcanno_flgs['Otherinfo']].split(';')
     cancer_type="Cancer"
+    out_list=""
     #if (len(clstt[0])>0):
     #    cancer_type=clstt[0]
     try:
@@ -798,6 +775,7 @@ def check_Thera(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     func=cls[Funcanno_flgs['Func.refGene']]
     exonfunc=cls[Funcanno_flgs['Func.refGene']]
     # ABL1:NM_005157:exon6:c.C944T:p.T315I,ABL1:NM_007313:exon6:c.C1001T:p.T334I
+
     # AAChange.refGene  only check variant with  AAchange information
     line_tmp=cls[Funcanno_flgs['Gene']]+" "+cls[Funcanno_flgs['Func.refGene']]+" "+cls[Funcanno_flgs['ExonicFunc.refGene']]+" "+cancer_type
     line_tmp2=cls[Funcanno_flgs['AAChange.refGene']]
@@ -805,18 +783,20 @@ def check_Thera(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     line_tmp2_sp=re.split(';|,',line_tmp2)
     exon_func=cls[Funcanno_flgs['ExonicFunc.refGene']]
     marker_key0=gene_tr+"_"+"mut_any"
+    out_list=""
     for cls0 in line_tmp2_sp:
         cls0_1=cls0.split(':')
-
-        if(len(cls0)>1 and len(line_tmp2_sp)>0 and len(cls0_1)==5 ):
+        if(len(cls0)>1 and len(line_tmp2_sp)>0 and len(cls0_1)>=4 ):
             cls0_1=cls0.split(':')
             gene=cls0_1[0]
             transc=cls0_1[1]
             exon=re.sub('exon','',cls0_1[2])
             cdna_change=re.sub('c.','',cls0_1[3])
-            amino_change=re.sub('p.','',cls0_1[4])
+            amino_change="NA";
+            if(len(cls0_1)==5):amino_change=re.sub('p.','',cls0_1[4])
             ltt=len(amino_change)
-            codon_num=amino_change[1:ltt-1]
+            codon_num="NA";
+            if(len(cls0_1)==5):codon_num=amino_change[1:ltt-1]
             #print gene, transc,exon,cdna_change,amino_change,cancer_type 
             marker_key=gene+"_"+amino_change
             marker_key0=gene+"_"+"mut_any"
@@ -848,36 +828,42 @@ def check_Thera(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
                 marker_key00=gene+"_"+"insertion_any"
                 marker_key11=gene+"_"+"exon_"+exon+"_insertion"
                 marker_key22=gene+"_"+"codon_"+codon_num+"_insertion"
- 
+             # caution: frameshift insertion or deletion 
             #deletion frameshift indel missense nonsense_any
             # nonsynonymous SNV;stopgain/stoploss(nonsense);frameshift insertion/deletion/substitution; nonframeshift insertion/deletion/substitution;
             default_s=""
             add_list=cancervar_markers_dict.get(marker_key,default_s)+cancervar_markers_dict.get(marker_key0,default_s)+cancervar_markers_dict.get(marker_key00,default_s)+cancervar_markers_dict.get(marker_key1,default_s)+cancervar_markers_dict.get(marker_key11,default_s)+cancervar_markers_dict.get(marker_key2,default_s)+cancervar_markers_dict.get(marker_key22,default_s)
             cgi_list=add_list
-            #print gene,add_list
+            #out_list="";
             level_AB="0"
             level_CD="0"
             level=0 # ABCD
+            #out_list=""
             for i in cgi_list.split(","):
                 #print i
                 if(len(i)>0):
                     pos=int(i)
                     if(cancervar_d[pos][9]=="Therapeutic"):
+                        out_list=str(pos)+","+out_list
                         t_level=cancervar_d[pos][10]
                         #print gene,pos,t_level,cancervar_d[pos][10],cancervar_d[pos][9]
-                        if(t_level=='A'): level=2;
-                        if(t_level=='B'): level=2;
-                        if(t_level=='C'): level=1;
-                        if(t_level=='D'): level=1;
+                        if(t_level=='A' and level < 2 ): level=2;
+                        if(t_level=='B' and level < 2 ): level=2;
+                        if(t_level=='C' and level < 1 ): level=1;
+                        if(t_level=='D' and level < 1): level=1;
+                        #print cancer_type,cancervar_d[pos][8]
                         if( not  re.findall(cancer_type, cancervar_d[pos][8], flags=re.IGNORECASE)   ):
                             if(t_level=='A' or t_level=='B'):  # did not find the specific type, decrease level
                                 level=1;
  
             #print gene,level,"Therapeutic"
     Thera=level 
+    if(out_list==""):  out_list="."
 
-       
-    return(Thera)
+    out_list_t=list(set(out_list.split(","))) 
+    str_out_t = ",".join(out_list_t)
+    out_list=str_out_t;
+    return(Thera,out_list)
     #print line_tmp
 
 def check_Diagno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
@@ -893,6 +879,7 @@ def check_Diagno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     cls=line.split('\t')
     clstt=cls[Funcanno_flgs['Otherinfo']].split(';')
     cancer_type="Cancer"
+    out_list=""
     #if (len(clstt[0])>0):
     #    cancer_type=clstt[0]
     try:
@@ -914,17 +901,21 @@ def check_Diagno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     line_tmp2_sp=re.split(';|,',line_tmp2)
     exon_func=cls[Funcanno_flgs['ExonicFunc.refGene']]
     marker_key0=gene_tr+"_"+"mut_any"
+    out_list=""
     for cls0 in line_tmp2_sp:
         cls0_1=cls0.split(':')
-        if(len(cls0)>1 and len(line_tmp2_sp)>0 and len(cls0_1)==5 ):
+        if(len(cls0)>1 and len(line_tmp2_sp)>0 and len(cls0_1)>=4 ):
             cls0_1=cls0.split(':')
             gene=cls0_1[0]
             transc=cls0_1[1]
             exon=re.sub('exon','',cls0_1[2])
             cdna_change=re.sub('c.','',cls0_1[3])
-            amino_change=re.sub('p.','',cls0_1[4])
+            amino_change="NA";
+            if(len(cls0_1)==5):amino_change=re.sub('p.','',cls0_1[4])
             ltt=len(amino_change)
-            codon_num=amino_change[1:ltt-1]
+            codon_num="NA";
+            if(len(cls0_1)==5):codon_num=amino_change[1:ltt-1]
+
             #print gene, transc,exon,cdna_change,amino_change,cancer_type 
             marker_key=gene+"_"+amino_change
             marker_key0=gene+"_"+"mut_any"
@@ -966,17 +957,19 @@ def check_Diagno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
             level_AB="0"
             level_CD="0"
             level=0 # ABCD
+            #out_list=""
             for i in cgi_list.split(","):
                 #print i
                 if(len(i)>0):
                     pos=int(i)
                     if(cancervar_d[pos][9]=="Diagnostic"):
                         t_level=cancervar_d[pos][10]
+                        out_list=str(pos)+","+out_list
                         #print gene,pos,t_level,cancervar_d[pos][10],cancervar_d[pos][9]
-                        if(t_level=='A'): level=2;
-                        if(t_level=='B'): level=2;
-                        if(t_level=='C'): level=1;
-                        if(t_level=='D'): level=1;
+                        if(t_level=='A'  and level < 2 ): level=2;
+                        if(t_level=='B'  and level < 2 ): level=2;
+                        if(t_level=='C'  and level < 1 ): level=1;
+                        if(t_level=='D'  and level < 1 ): level=1;
                         if( not  re.findall(cancer_type, cancervar_d[pos][8], flags=re.IGNORECASE)   ):
                             if(t_level=='A' or t_level=='B'):  # did not find the specific type, decrease level
                                 level=1;
@@ -984,9 +977,14 @@ def check_Diagno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
             #print gene,level
             
 
-    Diagno=level;
+    Diagno=level; 
+    if(out_list==""):  out_list="."
 
-    return(Diagno)
+    out_list_t=list(set(out_list.split(",")))
+    str_out_t = ",".join(out_list_t)
+    out_list=str_out_t;
+
+    return(Diagno,out_list)
 
 def check_Progno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     '''Prognostic: 
@@ -1001,6 +999,7 @@ def check_Progno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     cls=line.split('\t')
     clstt=cls[Funcanno_flgs['Otherinfo']].split(';')
     cancer_type="Cancer"
+    out_list=""
     #if (len(clstt[0])>0):
     #    cancer_type=clstt[0]
     try:
@@ -1022,17 +1021,21 @@ def check_Progno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     line_tmp2_sp=re.split(';|,',line_tmp2)
     exon_func=cls[Funcanno_flgs['ExonicFunc.refGene']]
     marker_key0=gene_tr+"_"+"mut_any"
+    out_list=""
     for cls0 in line_tmp2_sp:
         cls0_1=cls0.split(':')
-        if(len(cls0)>1 and len(line_tmp2_sp)>0 and len(cls0_1)==5 ):
+        if(len(cls0)>1 and len(line_tmp2_sp)>0 and len(cls0_1)>=4 ):
             cls0_1=cls0.split(':')
             gene=cls0_1[0]
             transc=cls0_1[1]
             exon=re.sub('exon','',cls0_1[2])
             cdna_change=re.sub('c.','',cls0_1[3])
-            amino_change=re.sub('p.','',cls0_1[4])
+
+            amino_change="NA";
+            if(len(cls0_1)==5):amino_change=re.sub('p.','',cls0_1[4])
             ltt=len(amino_change)
-            codon_num=amino_change[1:ltt-1]
+            codon_num="NA";
+            if(len(cls0_1)==5):codon_num=amino_change[1:ltt-1]
             #print gene, transc,exon,cdna_change,amino_change,cancer_type 
             marker_key=gene+"_"+amino_change
             marker_key0=gene+"_"+"mut_any"
@@ -1074,17 +1077,19 @@ def check_Progno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
             level_AB="0"
             level_CD="0"
             level=0 # ABCD
+            #out_list=""
             for i in cgi_list.split(","):
                 #print i
                 if(len(i)>0):
                     pos=int(i)
                     if(cancervar_d[pos][9]=="Prognostic"):
                         t_level=cancervar_d[pos][10]
+                        out_list=str(pos)+","+out_list
                         #print gene,pos,t_level,cancervar_d[pos][10],cancervar_d[pos][9]
-                        if(t_level=='A'): level=2;
-                        if(t_level=='B'): level=2;
-                        if(t_level=='C'): level=1;
-                        if(t_level=='D'): level=1;
+                        if(t_level=='A'  and level < 2 ): level=2;
+                        if(t_level=='B'  and level < 2 ): level=2;
+                        if(t_level=='C'  and level < 1 ): level=1;
+                        if(t_level=='D'  and level < 1 ): level=1;
                         if( not  re.findall(cancer_type, cancervar_d[pos][8], flags=re.IGNORECASE)   ):
                             if(t_level=='A' or t_level=='B'):  # did not find the specific type, decrease level
                                 level=1;
@@ -1094,8 +1099,14 @@ def check_Progno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
 
 
     Progno=level
+    if(out_list==""):  out_list="."
+    
+    out_list_t=list(set(out_list.split(",")))
+    str_out_t = ",".join(out_list_t)
+    out_list=str_out_t;
 
-    return(Progno)
+
+    return(Progno,out_list)
 
 def check_Mut(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     '''Mutation type:
@@ -1167,10 +1178,10 @@ def check_PopD(line,Freqs_flgs,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     1  Absent or extremely low MAF
     1  Absent or extremely low MAF
     1  Absent or extremely low MAF
-    0  MAF>0.5% in the general population; or high MAF in some ethnic populations
+    0  MAF>0.01% in the general population; or high MAF in some ethnic populations
     
     '''
-    MAF_cutoff=0.005
+    MAF_cutoff=0.0001
     PopD=0;
     cls=line.split('\t')
     Freqs_3pops={'1000g2015aug_all':0,'esp6500siv2_all':0,'ExAC_ALL':0,'gnomAD_genome_ALL':0}
@@ -1185,8 +1196,8 @@ def check_PopD(line,Freqs_flgs,Funcanno_flgs,Allels_flgs,lof_genes_dict):
 
     for key in Freqs_3pops.keys():
         try:
-            #if (cls[Freqs_flgs[key]]!='.' and float(cls[Freqs_flgs[key]])>0.01): PopD=0 #  MAF>1%
-            if (cls[Freqs_flgs[key]]!='.' and float(cls[Freqs_flgs[key]])<MAF_cutoff): PopD=0  #  extremely low MAF
+            if (cls[Freqs_flgs[key]]!='.' and float(cls[Freqs_flgs[key]])>0.01): PopD=0 #  MAF>1%
+            if (cls[Freqs_flgs[key]]!='.' and float(cls[Freqs_flgs[key]])<MAF_cutoff): PopD=1  #  extremely low MAF
 
         except ValueError:
             pass
@@ -1207,12 +1218,13 @@ def check_GermD(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     cls=line.split('\t')
 
     line_tmp2=cls[Funcanno_flgs['CLNSIG']]
+    if (line_tmp2 == "."): GermD=0
     if line_tmp2.find("enign")<0 and line_tmp2.find("athogenic")>=0:
-        GermD=2
-    if line_tmp2.find("ikely benign")>=0 or line_tmp2.find("enign")>=0:
-        GermD=0
-    if line_tmp2.find("enign")>=0 and line_tmp2.find("athogenic")>=0:
         GermD=1
+    if line_tmp2.find("ikely benign")>=0 or line_tmp2.find("enign")>=0:
+        GermD=-1
+    if line_tmp2.find("enign")>=0 and line_tmp2.find("athogenic")>=0:
+        GermD=0
     if line_tmp2.find("ncertain significance")>=0 :
         GermD=0
     #print "GermD=",GermD,cls[Funcanno_flgs['CLNSIG']]
@@ -1242,12 +1254,12 @@ def check_SomD(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
 
 def check_PreP(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     '''Predictive software: SIFT, PolyPhen2, MutTaster, CADD, MetaSVM
-   2 Mostly damaging; information to be used for reference only
-   2 Mostly damaging; information to be used for reference only
+   2 Mostly damaging; information to be used for reference only >6
+   1 Mostly damaging; information to be used for reference only >3
    0 Variable; information to be used for reference only
-   1 Mostly benign; information to be used for reference only
+   -1 Mostly benign; information to be used for reference only
     '''
-    # MetaSVM SIFT Polyphen2_HDIV MetaLR FATHMM  MutationTaster
+    # MetaSVM SIFT Polyphen2_HDIV MetaLR FATHMM  MutationAssessor
     sift_cutoff=0.05 #SIFT_score,SIFT_pred, The smaller the score the more likely the SNP has damaging effect
     metasvm_cutoff=0 # greater scores indicating more likely deleterious effects
     cutoff_conserv=2 # for GERP++_RS
@@ -1301,11 +1313,11 @@ def check_PreP(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     if cls[Funcanno_flgs['FATHMM_pred']] == "." :
         var=var+1
 
-    if cls[Funcanno_flgs['MutationTaster_pred']] == "A" or cls[Funcanno_flgs['MutationTaster_pred']] == "D":
+    if cls[Funcanno_flgs['MutationAssessor_pred']] == "H" or cls[Funcanno_flgs['MutationAssessor_pred']] == "M":
         dam=dam+1
-    if cls[Funcanno_flgs['MutationTaster_pred']] == "P":
+    if cls[Funcanno_flgs['MutationAssessor_pred']] == "L" or cls[Funcanno_flgs['MutationAssessor_pred']] == "N":
         ben=ben+1
-    if cls[Funcanno_flgs['MutationTaster_pred']] == "." :
+    if cls[Funcanno_flgs['MutationAssessor_pred']] == "." :
         var=var+1
     
     if cls[Funcanno_flgs['GERP++_RS']] == ".": 
@@ -1318,12 +1330,11 @@ def check_PreP(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
         
 
 
-
-
-    if dam >4: PreP=2;
-    if ben >3: PreP=0;
-    if var >3: Prep=1;
-    if dam==ben: PreP=1;
+    if dam >3: PreP=1;
+    if dam >5: PreP=2;
+    if ben >3: PreP=-1;
+    if var >3: Prep=0;
+    if dam==ben: PreP=0;
 
     #print "PreP=",PreP,dam,ben,var
     return(PreP)
@@ -1467,13 +1478,13 @@ def assign(BP,line,Freqs_flgs,Funcanno_flgs,Allels_flgs):
     CBP=[0,0,0,0,0,0,0,0,0,0,0,0]
 
     Therapeutic=check_Thera(line,Funcanno_flgs,Allels_flgs,lof_genes_dict)
-    CBP[0]=Therapeutic
+    CBP[0],Therap_list=Therapeutic
 
     Diagnosis=check_Diagno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict)
-    CBP[1]=Diagnosis
+    CBP[1],Diag_list=Diagnosis
 
     Prognosis=check_Progno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict)
-    CBP[2]=Prognosis
+    CBP[2],Prog_list=Prognosis
 
     Mutation_type=check_Mut(line,Funcanno_flgs,Allels_flgs,lof_genes_dict)
     CBP[3]=Mutation_type
@@ -1539,11 +1550,11 @@ def assign(BP,line,Freqs_flgs,Funcanno_flgs,Allels_flgs):
         BP_out=classfy(CBP,Allels_flgs,cls)
         line_t="%s EVS=%s" %(BP_out,CBP)
 
-        #print("%s " % BP_out)
         BP_out=line_t
+        #print("%s " % BP_out)
         pass
     #BP=BP_out
-    return(BP_out)
+    return(BP_out,Therap_list,Diag_list,Prog_list)
 
 
 def search_key_index(line,dict):
@@ -1561,10 +1572,11 @@ def my_inter_var_can(annovar_outfile):
     newoutfile2=annovar_outfile+".cancervar"
 
     Freqs_flgs={'1000g2015aug_all':0,'esp6500siv2_all':0,'ExAC_ALL':0,'ExAC_AFR':0,'ExAC_AMR':0,'ExAC_EAS':0,'ExAC_FIN':0,'ExAC_NFE':0,'ExAC_OTH':0,'ExAC_SAS':0,'gnomAD_genome_ALL':0,'gnomAD_genome_AFR':0,'gnomAD_genome_AMR':0,'gnomAD_genome_EAS':0,'gnomAD_genome_FIN':0,'gnomAD_genome_NFE':0,'gnomAD_genome_OTH':0,'gnomAD_genome_ASJ':0}
-    Funcanno_flgs={'Func.refGene':0,'ExonicFunc.refGene':0,'AAChange.refGene':0,'Gene':0,'Gene damage prediction (all disease-causing genes)':0,'CLNDBN':0,'CLNACC':0,'CLNDSDB':0,'dbscSNV_ADA_SCORE':0,'dbscSNV_RF_SCORE':0,'GERP++_RS':0,'LoFtool_percentile':0,'Interpro_domain':0,'rmsk':0,'SIFT_score':0,'phastCons20way_mammalian':0,'Gene.ensGene':0,'CLNSIG':0,'CADD_raw':0,'CADD_phred':0,'avsnp147':0,'AAChange.ensGene':0,'AAChange.knownGene':0,'MetaSVM_score':0,'cosmic70':0,'ICGC_Id':0,'ICGC_Occurrence':0,'Otherinfo':0,'Polyphen2_HDIV_pred':0,'MetaLR_pred':0,'MutationTaster_pred':0,'FATHMM_pred':0,'Otherinfo':0}
+    Funcanno_flgs={'Func.refGene':0,'ExonicFunc.refGene':0,'AAChange.refGene':0,'Gene':0,'Gene damage prediction (all disease-causing genes)':0,'CLNDBN':0,'CLNACC':0,'CLNDSDB':0,'dbscSNV_ADA_SCORE':0,'dbscSNV_RF_SCORE':0,'GERP++_RS':0,'LoFtool_percentile':0,'Interpro_domain':0,'rmsk':0,'SIFT_score':0,'phastCons20way_mammalian':0,'Gene.ensGene':0,'CLNSIG':0,'CADD_raw':0,'CADD_phred':0,'avsnp147':0,'AAChange.ensGene':0,'AAChange.knownGene':0,'MetaSVM_score':0,'cosmic70':0,'ICGC_Id':0,'ICGC_Occurrence':0,'Otherinfo':0,'Polyphen2_HDIV_pred':0,'MetaLR_pred':0,'MutationTaster_pred':0,'FATHMM_pred':0,'Polyphen2_HDIV_score':0,'MutationAssessor_score':0,'FATHMM_score':0,'MetaLR_score':0,'LRT_score':0,'MutationTaster_score':0,'MutationAssessor_pred':0,'Otherinfo':0}
     Allels_flgs={'Chr':0,'Start':0,'End':0,'Ref':0,'Alt':0}
 # ExAC_ALL esp6500siv2_all   1000g2015aug_all  SIFT_score    CADD_raw    CADD_phred  GERP++_RS   phastCons20way_mammalian  dbscSNV_ADA_SCORE   dbscSNV_RF_SCORE   Interpro_domain
-
+    ## MetaSVM SIFT Polyphen2_HDIV MetaLR FATHMM  MutationAssessor
+    # "Polyphen2_HDIV_score","FATHMM_score","MetaLR_score","MutationAssessor_score"
     try:
         fh=open(newoutfile, "r")
         fw=open(newoutfile2, "w")
@@ -1572,9 +1584,9 @@ def my_inter_var_can(annovar_outfile):
         line_sum=0;
         print("Notice: Begin the variants interpretation by CancerVar ")
         if re.findall('true',paras['otherinfo'], flags=re.IGNORECASE)  :
-            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "Freq_gnomAD_genome_ALL","CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phastCons20way_mammalian","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","MetaSVM_score","Freq_ExAC_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha","Otherinfo"  ))
+            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "Freq_gnomAD_genome_ALL","CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phastCons20way_mammalian","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","MetaSVM_score","Freq_gnomAD_genome_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha","Pathway","Therap_list","Diag_list","Prog_list","Polyphen2_HDIV_score","FATHMM_score","MetaLR_score","MutationAssessor_score","Otherinfo"  ))
         else:
-            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "Freq_gnomAD_genome_ALL","CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phastCons20way_mammalian","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","MetaSVM_score","Freq_ExAC_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha"  ))
+            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "Freq_gnomAD_genome_ALL","CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phastCons20way_mammalian","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","MetaSVM_score","Freq_gnomAD_genome_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha","Pathway","Therap_list","Diag_list","Prog_list","Polyphen2_HDIV_score","FATHMM_score","MetaLR_score","MutationAssessor_score"  ))
         for line in strs.split('\n'):
             BP="UNK" # the inter of pathogenetic/benign
             clinvar_bp="UNK"
@@ -1592,8 +1604,10 @@ def my_inter_var_can(annovar_outfile):
                     cls3=line_tmp2.split(';')
                     clinvar_bp=cls3[0]
 
-                cancervar_bp=assign(BP,line,Freqs_flgs,Funcanno_flgs,Allels_flgs)
+                cancervar_bp,Therap_list,Diag_list,Prog_list=assign(BP,line,Freqs_flgs,Funcanno_flgs,Allels_flgs)
+                #print Therap_list
                 Freq_ExAC_POPs="AFR:"+cls[Freqs_flgs['ExAC_AFR']]+",AMR:"+cls[Freqs_flgs['ExAC_AMR']]+",EAS:"+cls[Freqs_flgs['ExAC_EAS']]+",FIN:"+cls[Freqs_flgs['ExAC_FIN']]+",NFE:"+cls[Freqs_flgs['ExAC_NFE']]+",OTH:"+cls[Freqs_flgs['ExAC_OTH']]+",SAS:"+cls[Freqs_flgs['ExAC_SAS']]
+                Freq_gnomAD_genome_POPs="AFR:"+cls[Freqs_flgs['gnomAD_genome_AFR']]+",AMR:"+cls[Freqs_flgs['gnomAD_genome_AMR']]+",EAS:"+cls[Freqs_flgs['gnomAD_genome_EAS']]+",FIN:"+cls[Freqs_flgs['gnomAD_genome_FIN']]+",NFE:"+cls[Freqs_flgs['gnomAD_genome_NFE']]+",OTH:"+cls[Freqs_flgs['gnomAD_genome_OTH']]+",ASJ:"+cls[Freqs_flgs['gnomAD_genome_ASJ']]
                 OMIM="."
                 mim2=mim2gene_dict2.get(cls[Funcanno_flgs['Gene']],".")
                 mim1=mim2gene_dict.get(cls[Funcanno_flgs['Gene.ensGene']],".")
@@ -1617,11 +1631,14 @@ def my_inter_var_can(annovar_outfile):
                 if(orpha_details ==""):
                     orpha_details="."
 
-
+                pathway=cancer_pathway_dict.get(cls[Funcanno_flgs['Gene']],".");
+    # "Polyphen2_HDIV_score","FATHMM_score","MetaLR_score","MutationAssessor_score"
+#cls[Funcanno_flgs['Polyphen2_HDIV_score']],cls[Funcanno_flgs['FATHMM_score']],cls[Funcanno_flgs['MetaLR_score']],cls[Funcanno_flgs['MutationAssessor_score']]
+                    
                 if re.findall('true',paras['otherinfo'], flags=re.IGNORECASE)  :
-                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']],cls[Freqs_flgs['gnomAD_genome_ALL']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phastCons20way_mammalian']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['MetaSVM_score']],Freq_ExAC_POPs,OMIM,Pheno_MIM,orpha,orpha_details,cls[Funcanno_flgs['Otherinfo']]     ))
+                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']],cls[Freqs_flgs['gnomAD_genome_ALL']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phastCons20way_mammalian']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['MetaSVM_score']],Freq_gnomAD_genome_POPs,OMIM,Pheno_MIM,orpha,orpha_details,pathway,Therap_list,Diag_list,Prog_list,cls[Funcanno_flgs['Polyphen2_HDIV_score']],cls[Funcanno_flgs['FATHMM_score']],cls[Funcanno_flgs['MetaLR_score']],cls[Funcanno_flgs['MutationAssessor_score']],cls[Funcanno_flgs['Otherinfo']]     ))
                 else:
-                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Freqs_flgs['gnomAD_genome_ALL']],cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phastCons20way_mammalian']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['MetaSVM_score']],Freq_ExAC_POPs,OMIM,Pheno_MIM,orpha,orpha_details   ))
+                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Freqs_flgs['gnomAD_genome_ALL']],cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phastCons20way_mammalian']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['MetaSVM_score']],Freq_gnomAD_genome_POPs,OMIM,Pheno_MIM,orpha,orpha_details,pathway,Therap_list,Diag_list,Prog_list,cls[Funcanno_flgs['Polyphen2_HDIV_score']],cls[Funcanno_flgs['FATHMM_score']],cls[Funcanno_flgs['MetaLR_score']],cls[Funcanno_flgs['MutationAssessor_score']]   ))
                 #print("%s\t%s %s" % (line,clinvar_bp,cancervar_bp))
 
             line_sum=line_sum+1
@@ -1658,7 +1675,7 @@ def main():
                   help="The config file of all options. it is for your own configure file.You can edit all the options in the configure and if you use this options,you can ignore all the other options bellow", metavar="config.ini")
 
     parser.add_option("-b", "--buildver", dest="buildver", action="store",
-                  help="The genomic build version, it can be hg19 and will support GRCh37 hg18 GRCh38 later", metavar="hg19")
+                  help="The genomic build version, it can be hg19 and  hg38", metavar="hg19")
 
 
     parser.add_option("-i", "--input", dest="input", action="store",
@@ -1668,7 +1685,7 @@ def main():
                   help="The input file type, it can be  AVinput(Annovar's format),VCF(VCF with single sample),VCF_m(VCF with multiple samples)", metavar="AVinput")
 
     parser.add_option("--cancer_type", dest="cancer_type", action="store",
-                  help="The cancer type, please check the doc for the details of cancer types: Adrenal_Gland Bile_Duct Bladder Blood Bone Bone_Marrow Brain Breast Cancer Cancervar_type Cervix Colorectal Esophagus Eye Head_and_Neck Inflammatory Intrahepatic Kidney Liver Lung Lymph_Nodes Nervous_System Other Ovary Pancreas Pleura Prostate Skin Soft_Tissue Stomach Testis Thymus Thyroid Uterus)", metavar="CANCER")
+                  help="The cancer type, please check the doc for the details of cancer types: Adrenal_Gland Bile_Duct Bladder Blood Bone Bone_Marrow Brain Breast Cancer_all Cervix Colorectal Esophagus Eye Head_and_Neck Inflammatory Intrahepatic Kidney Liver Lung Lymph_Nodes Nervous_System Other Ovary Pancreas Pleura Prostate Skin Soft_Tissue Stomach Testis Thymus Thyroid Uterus),if you are using avinputcancers_types file, you can can specify the cancer type in the 6th column", metavar="CANCER")
 
     parser.add_option("-o", "--output", dest="output", action="store",
                   help="The prefix of output file which contains the results, the file of results will be as [$$prefix].cancervar ", metavar="example/myanno")
@@ -1719,9 +1736,10 @@ def main():
 
 
 
-
-    if os.path.isfile("config.ini"):
-        config.read("config.ini")
+    config_file = os.path.join(os.path.dirname(__file__),"config.ini")
+    
+    if os.path.isfile(config_file):
+        config.read(config_file)
         sections = config.sections()
         for section in sections:
             ConfigSectionMap(config,section)
@@ -1769,9 +1787,6 @@ def main():
         paras['cancers_types']=paras['database_cancervar']+'/cancervar.cancer.types'
 
 
-    #paras['ps1_aa'] = paras['ps1_aa']+'.'+paras['buildver']
-    #paras['ps4_snps'] = paras['ps4_snps']+'.'+paras['buildver']
-    #paras['bs2_snps'] = paras['bs2_snps']+'.'+paras['buildver']
     paras['exclude_snps'] = paras['exclude_snps']+'.'+paras['buildver']
 
     if options.table_annovar != None:
@@ -1824,7 +1839,7 @@ def main():
         check_annovar_result() #  to obtain myanno.hg19_multianno.csv
     else:
          print ("Warning: You activated the option of --skip_annovar, the Annovar will not run!")
-         print ("Warning: The InterVar will interpret the variants based on your old annotation information!")
+         print ("Warning: The CancerVar will interpret the variants based on your old annotation information!")
 
     #check_annovar_result() #  to obtain myanno.hg19_multianno.csv
     read_datasets()
@@ -1856,9 +1871,9 @@ def main():
         if some_file_fail>=1:
             print ("Warning: The CancerVar seems not run correctly for your %d samples in the VCF, please check your inputs and options in configure file" %  some_file_fail )
     if out_annf==0:
-         print ("Warning: The InterVar seems not run correctly, please check your inputs , options and configure file!")
-         print ("ERROR: The InterVar did not find the annotation result file from ANNOVAR!")
-         print ("ERROR: The name of annotation result file should be like %s*.%s__multianno.txt" % (paras['outfile'],paras['buildver']))
+         print ("Warning: The CancerVar seems not run correctly, please check your inputs , options and configure file!")
+         print ("ERROR: The CancerVar did not find the annotation result file from ANNOVAR!")
+         print ("ERROR: The name of annotation result file should be like %s*.%s_multianno.txt" % (paras['outfile'],paras['buildver']))
     print("%s" %end)
 
 
