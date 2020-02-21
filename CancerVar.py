@@ -11,8 +11,8 @@ import string,copy,logging,os,io,re,time,sys,platform,optparse,gzip,csv,glob
 
 prog="CancerVar"
 
-version = """%prog 1.1
-relase 20200119
+version = """%prog 1.1.1
+release 20200119
 Copyright (C) 2020 Wang Genomic Lab
 CancerVar is free for non-commercial use without warranty.
 Please contact the authors for commercial use.
@@ -1685,7 +1685,7 @@ def main():
                   help="The input file type, it can be  AVinput(Annovar's format),VCF(VCF with single sample),VCF_m(VCF with multiple samples)", metavar="AVinput")
 
     parser.add_option("--cancer_type", dest="cancer_type", action="store",
-                  help="The cancer type, please check the doc for the details of cancer types: Adrenal_Gland Bile_Duct Bladder Blood Bone Bone_Marrow Brain Breast Cancer_all Cervix Colorectal Esophagus Eye Head_and_Neck Inflammatory Intrahepatic Kidney Liver Lung Lymph_Nodes Nervous_System Other Ovary Pancreas Pleura Prostate Skin Soft_Tissue Stomach Testis Thymus Thyroid Uterus),if you are using avinputcancers_types file, you can can specify the cancer type in the 6th column", metavar="CANCER")
+                  help="The cancer type, please check the doc for the details of cancer types: Adrenal_Gland Bile_Duct Bladder Blood Bone Bone_Marrow Brain Breast Cancer_all Cervix Colorectal Esophagus Eye Head_and_Neck Inflammatory Intrahepatic Kidney Liver Lung Lymph_Nodes Nervous_System Other Ovary Pancreas Pleura Prostate Skin Soft_Tissue Stomach Testis Thymus Thyroid Uterus),if you are using avinput file, you can can specify the cancer type in the 6th column", metavar="CANCER")
 
     parser.add_option("-o", "--output", dest="output", action="store",
                   help="The prefix of output file which contains the results, the file of results will be as [$$prefix].cancervar ", metavar="example/myanno")
