@@ -82,7 +82,7 @@ CancerVar is free for non-commercial use without warranty. Users need to obtain 
 ## REFERENCE
 
 
-Quan Li,Yunyun Zhou and Kai Wang. CancerVar: a web server for improved evidence-based clinical interpretation for cancer somatic mutations (Under Review,2020)
+Quan Li,Yunyun Zhou and Kai Wang. CancerVar: a web server for improved evidence-based clinical interpretation of cancer somatic mutations and copy number abnormalities (Under Review,2020)
 
 Quan Li and Kai Wang. InterVar: Clinical interpretation of genetic variants by ACMG-AMP 2015 guideline. The American Journal of Human Genetics 100, 1-14, February 2, 2017,[http://dx.doi.org/10.1016/j.ajhg.2017.01.004](http://dx.doi.org/10.1016/j.ajhg.2017.01.004)
 
