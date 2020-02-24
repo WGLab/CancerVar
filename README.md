@@ -1,5 +1,12 @@
 # CancerVar
 Clinical interpretation of somatic mutations in cancer
+........................................................................
+..%%%%....%%%%...%%..%%...%%%%...%%%%%%..%%%%%...%%..%%...%%%%...%%%%%..
+.%%..%%..%%..%%..%%%.%%..%%..%%..%%......%%..%%..%%..%%..%%..%%..%%..%%.
+.%%......%%%%%%..%%.%%%..%%......%%%%....%%%%%...%%..%%..%%%%%%..%%%%%..
+.%%..%%..%%..%%..%%..%%..%%..%%..%%......%%..%%...%%%%...%%..%%..%%..%%.
+..%%%%...%%..%%..%%..%%...%%%%...%%%%%%..%%..%%....%%....%%..%%..%%..%%.
+........................................................................
 
 ## SYNOPSIS
 
@@ -36,7 +43,7 @@ input file of  variants for analysis
 The input file type, it can be  AVinput(Annovar''sformat),VCF
 
 - --cancer_type=CANCER  
-The cancer type, please check the help for the details of cancer type)
+The cancer type, please check the help for the details of cancer type
 
 
 - -o OUTPUTFILE, --output=OUTPUTFILE
