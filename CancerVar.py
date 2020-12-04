@@ -607,18 +607,18 @@ def check_annovar_result():
         sys.exit()
     if inputft.lower() == 'avinput' :
         #cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol refGene,esp6500siv2_all,1000g2015aug_all,avsnp147,dbnsfp30a,clinvar_20160302,exac03,dbscsnv11,dbnsfp31a_interpro,rmsk,ensGene,knownGene  -operation  g,f,f,f,f,f,f,f,f,r,g,g   -nastring ."+annovar_options
-        cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,clinvar_20190305,cosmic70,icgc21,gnomad_genome  -operation  g,g,g,f,f,f,f,f,f,f,f,f,f,f  -nastring ."+annovar_options
+        cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,clinvar_20190305,cosmic91,icgc28,gnomad_genome  -operation  g,g,g,f,f,f,f,f,f,f,f,f,f,f  -nastring ."+annovar_options
         print("%s" %cmd)
         os.system(cmd)
     if inputft.lower() == 'vcf' :
-        cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+".avinput "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol  refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,clinvar_20190305,cosmic70,icgc21,gnomad_genome  -operation  g,g,g,f,f,f,f,f,f,f,f,f,f,f   -nastring ."+annovar_options
+        cmd="perl "+paras['table_annovar']+" "+paras['inputfile']+".avinput "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ paras['outfile']+" -protocol  refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,clinvar_20190305,cosmic91,icgc28,gnomad_genome  -operation  g,g,g,f,f,f,f,f,f,f,f,f,f,f   -nastring ."+annovar_options
         print("%s" %cmd)
         os.system(cmd)
     if inputft.lower() == 'vcf_m' :
         for f in glob.iglob(paras['outfile']+"*.avinput"):
             print("INFO: Begin to annotate sample file of %s ...." %(f))
             new_outfile=re.sub(".avinput","",f)
-            cmd="perl "+paras['table_annovar']+" "+f+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ new_outfile +" -protocol  refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,clinvar_20161128,cosmic70,icgc21  -operation  g,g,g,f,f,f,f,f,f,f,f,f,f    -nastring ."+annovar_options
+            cmd="perl "+paras['table_annovar']+" "+f+" "+paras['database_locat']+" -buildver "+paras['buildver']+" -remove -out "+ new_outfile +" -protocol  refGene,ensGene,knownGene,esp6500siv2_all,1000g2015aug_all,exac03,avsnp147,dbnsfp30a,dbscsnv11,dbnsfp31a_interpro,clinvar_20161128,cosmic91,icgc28  -operation  g,g,g,f,f,f,f,f,f,f,f,f,f    -nastring ."+annovar_options
             print("%s" %cmd)
             os.system(cmd)
 
@@ -684,7 +684,7 @@ def sum_of_list(list):
     return(sum)
 
 def classfy(CBP,Allels_flgs,cls):
-    BPS=["Pathogenic","Likely_pathogenic","Benign/Likely_benign","Uncertain_significance"]
+    BPS=["Tier_I_strong","Tier_II_potential","Tier_IV_benign","Tier_III_Uncertain"]
     PAS_out=-1
     BES_out=-1
     BPS_out=3 # BPS=[3]:Uncertain significance
@@ -1022,6 +1022,7 @@ def check_Progno(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     exon_func=cls[Funcanno_flgs['ExonicFunc.refGene']]
     marker_key0=gene_tr+"_"+"mut_any"
     out_list=""
+    #print line
     for cls0 in line_tmp2_sp:
         cls0_1=cls0.split(':')
         if(len(cls0)>1 and len(line_tmp2_sp)>0 and len(cls0_1)>=4 ):
@@ -1237,29 +1238,30 @@ def check_SomD(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     1 Likely present
     0 Absent or present without association to specific tumors (potential germline VUS); present but in very few cases
     0 Absent or present without association to specific tumors (potential rare germline polymorphism)
-    ''' # cosmic70    ID=COSM12560;OCCURENCE=60(haematopoietic_and_lymphoid_tissue)
+    ''' # cosmic91    ID=COSM12560;OCCURENCE=60(haematopoietic_and_lymphoid_tissue)
     #ICGC_Id ICGC_Occurrence MU31370893  COCA-CN|1|187|0.00535,PRAD-CA|1|124|0.00806,SKCA-BR|1|66|0.01515,MELA-AU|2|183|0.01093
     SomD=0;
     cls=line.split('\t')
 
-    if cls[Funcanno_flgs['cosmic70']]!="." or cls[Funcanno_flgs['ICGC_Id']]!=".":
+    if cls[Funcanno_flgs['cosmic91']]!="." or cls[Funcanno_flgs['ICGC_Id']]!=".":
         SomD=1 
-    if cls[Funcanno_flgs['cosmic70']]=="." and cls[Funcanno_flgs['ICGC_Id']]==".":
+    if cls[Funcanno_flgs['cosmic91']]=="." and cls[Funcanno_flgs['ICGC_Id']]==".":
         SomD=0
-    if cls[Funcanno_flgs['cosmic70']]!="." and cls[Funcanno_flgs['ICGC_Id']]!=".":
+    if cls[Funcanno_flgs['cosmic91']]!="." and cls[Funcanno_flgs['ICGC_Id']]!=".":
         SomD=2 
     return(SomD)
     
 
 
 def check_PreP(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
-    '''Predictive software: SIFT, PolyPhen2, MutTaster, CADD, MetaSVM
+    '''Predictive software: SIFT, PolyPhen2, MutTaster, CADD, MetaSVM  GERP++, 
    2 Mostly damaging; information to be used for reference only >6
    1 Mostly damaging; information to be used for reference only >3
    0 Variable; information to be used for reference only
    -1 Mostly benign; information to be used for reference only
     '''
     # MetaSVM SIFT Polyphen2_HDIV MetaLR FATHMM  MutationAssessor
+	# remove MetaSVM and MetaLR
     sift_cutoff=0.05 #SIFT_score,SIFT_pred, The smaller the score the more likely the SNP has damaging effect
     metasvm_cutoff=0 # greater scores indicating more likely deleterious effects
     cutoff_conserv=2 # for GERP++_RS
@@ -1270,15 +1272,15 @@ def check_PreP(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     PreP=0;
 
     cls=line.split('\t')
-    try:
-        if float(cls[Funcanno_flgs['MetaSVM_score']]) <  metasvm_cutoff:
-            ben=ben+1
-        else:
-            dam=dam+1
-    except ValueError:  
-        var=var+1
-    else:
-        pass
+#    try:
+#        if float(cls[Funcanno_flgs['MetaSVM_score']]) <  metasvm_cutoff:
+#            ben=ben+1
+#        else:
+#            dam=dam+1
+#    except ValueError:  
+#        var=var+1
+#    else:
+#        pass
 
     try:
         if float(cls[Funcanno_flgs['SIFT_score']]) >= sift_cutoff:
@@ -1298,12 +1300,12 @@ def check_PreP(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
     if cls[Funcanno_flgs['Polyphen2_HDIV_pred']] == "." :
         var=var+1
 
-    if cls[Funcanno_flgs['MetaLR_pred']] == "D":
-        dam=dam+1
-    if cls[Funcanno_flgs['MetaLR_pred']] == "T" :
-        ben=ben+1
-    if cls[Funcanno_flgs['MetaLR_pred']] == "." :
-        var=var+1
+#    if cls[Funcanno_flgs['MetaLR_pred']] == "D":
+#        dam=dam+1
+#    if cls[Funcanno_flgs['MetaLR_pred']] == "T" :
+#        ben=ben+1
+#    if cls[Funcanno_flgs['MetaLR_pred']] == "." :
+#        var=var+1
 
 
     if cls[Funcanno_flgs['FATHMM_pred']] == "D":
@@ -1330,10 +1332,10 @@ def check_PreP(line,Funcanno_flgs,Allels_flgs,lof_genes_dict):
         
 
 
-    if dam >3: PreP=1;
-    if dam >5: PreP=2;
-    if ben >3: PreP=-1;
-    if var >3: Prep=0;
+    if dam >2: PreP=1;
+    if dam >4: PreP=2;
+    if ben >2: PreP=-1;
+    if var >2: Prep=0;
     if dam==ben: PreP=0;
 
     #print "PreP=",PreP,dam,ben,var
@@ -1572,7 +1574,7 @@ def my_inter_var_can(annovar_outfile):
     newoutfile2=annovar_outfile+".cancervar"
 
     Freqs_flgs={'1000g2015aug_all':0,'esp6500siv2_all':0,'ExAC_ALL':0,'ExAC_AFR':0,'ExAC_AMR':0,'ExAC_EAS':0,'ExAC_FIN':0,'ExAC_NFE':0,'ExAC_OTH':0,'ExAC_SAS':0,'gnomAD_genome_ALL':0,'gnomAD_genome_AFR':0,'gnomAD_genome_AMR':0,'gnomAD_genome_EAS':0,'gnomAD_genome_FIN':0,'gnomAD_genome_NFE':0,'gnomAD_genome_OTH':0,'gnomAD_genome_ASJ':0}
-    Funcanno_flgs={'Func.refGene':0,'ExonicFunc.refGene':0,'AAChange.refGene':0,'Gene':0,'Gene damage prediction (all disease-causing genes)':0,'CLNDBN':0,'CLNACC':0,'CLNDSDB':0,'dbscSNV_ADA_SCORE':0,'dbscSNV_RF_SCORE':0,'GERP++_RS':0,'LoFtool_percentile':0,'Interpro_domain':0,'rmsk':0,'SIFT_score':0,'phastCons20way_mammalian':0,'Gene.ensGene':0,'CLNSIG':0,'CADD_raw':0,'CADD_phred':0,'avsnp147':0,'AAChange.ensGene':0,'AAChange.knownGene':0,'MetaSVM_score':0,'cosmic70':0,'ICGC_Id':0,'ICGC_Occurrence':0,'Otherinfo':0,'Polyphen2_HDIV_pred':0,'MetaLR_pred':0,'MutationTaster_pred':0,'FATHMM_pred':0,'Polyphen2_HDIV_score':0,'MutationAssessor_score':0,'FATHMM_score':0,'MetaLR_score':0,'LRT_score':0,'MutationTaster_score':0,'MutationAssessor_pred':0,'Otherinfo':0}
+    Funcanno_flgs={'Func.refGene':0,'ExonicFunc.refGene':0,'AAChange.refGene':0,'Gene':0,'Gene damage prediction (all disease-causing genes)':0,'CLNDBN':0,'CLNACC':0,'CLNDSDB':0,'dbscSNV_ADA_SCORE':0,'dbscSNV_RF_SCORE':0,'GERP++_RS':0,'LoFtool_percentile':0,'Interpro_domain':0,'rmsk':0,'SIFT_score':0,'phastCons20way_mammalian':0,'Gene.ensGene':0,'CLNSIG':0,'CADD_raw':0,'CADD_phred':0,'avsnp147':0,'AAChange.ensGene':0,'AAChange.knownGene':0,'MetaSVM_score':0,'cosmic91':0,'ICGC_Id':0,'ICGC_Occurrence':0,'Otherinfo':0,'Polyphen2_HDIV_pred':0,'MetaLR_pred':0,'MutationTaster_pred':0,'FATHMM_pred':0,'Polyphen2_HDIV_score':0,'MutationAssessor_score':0,'FATHMM_score':0,'MetaLR_score':0,'LRT_score':0,'MutationTaster_score':0,'MutationAssessor_pred':0,'Otherinfo':0}
     Allels_flgs={'Chr':0,'Start':0,'End':0,'Ref':0,'Alt':0}
 # ExAC_ALL esp6500siv2_all   1000g2015aug_all  SIFT_score    CADD_raw    CADD_phred  GERP++_RS   phastCons20way_mammalian  dbscSNV_ADA_SCORE   dbscSNV_RF_SCORE   Interpro_domain
     ## MetaSVM SIFT Polyphen2_HDIV MetaLR FATHMM  MutationAssessor
@@ -1584,9 +1586,9 @@ def my_inter_var_can(annovar_outfile):
         line_sum=0;
         print("Notice: Begin the variants interpretation by CancerVar ")
         if re.findall('true',paras['otherinfo'], flags=re.IGNORECASE)  :
-            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "Freq_gnomAD_genome_ALL","CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phastCons20way_mammalian","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","MetaSVM_score","Freq_gnomAD_genome_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha","Pathway","Therap_list","Diag_list","Prog_list","Polyphen2_HDIV_score","FATHMM_score","MetaLR_score","MutationAssessor_score","Otherinfo"  ))
+            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "Freq_gnomAD_genome_ALL","CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phastCons20way_mammalian","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","MetaSVM_score","Freq_gnomAD_genome_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha","Pathway","Therap_list","Diag_list","Prog_list","Polyphen2_HDIV_score","FATHMM_score","MetaLR_score","MutationAssessor_score","cosmic91","icgc28","Otherinfo"  ))
         else:
-            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "Freq_gnomAD_genome_ALL","CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phastCons20way_mammalian","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","MetaSVM_score","Freq_gnomAD_genome_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha","Pathway","Therap_list","Diag_list","Prog_list","Polyphen2_HDIV_score","FATHMM_score","MetaLR_score","MutationAssessor_score"  ))
+            fw.write("#%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % ("Chr","Start","End","Ref","Alt","Ref.Gene","Func.refGene","ExonicFunc.refGene", "Gene.ensGene","avsnp147","AAChange.ensGene","AAChange.refGene","Clinvar","CancerVar and Evidence","Freq_ExAC_ALL", "Freq_esp6500siv2_all","Freq_1000g2015aug_all", "Freq_gnomAD_genome_ALL","CADD_raw","CADD_phred","SIFT_score","GERP++_RS","phastCons20way_mammalian","dbscSNV_ADA_SCORE", "dbscSNV_RF_SCORE", "Interpro_domain","AAChange.knownGene","MetaSVM_score","Freq_gnomAD_genome_POPs","OMIM","Phenotype_MIM","OrphaNumber","Orpha","Pathway","Therap_list","Diag_list","Prog_list","Polyphen2_HDIV_score","FATHMM_score","MetaLR_score","MutationAssessor_score","cosmic91","icgc28"  ))
         for line in strs.split('\n'):
             BP="UNK" # the inter of pathogenetic/benign
             clinvar_bp="UNK"
@@ -1636,9 +1638,9 @@ def my_inter_var_can(annovar_outfile):
 #cls[Funcanno_flgs['Polyphen2_HDIV_score']],cls[Funcanno_flgs['FATHMM_score']],cls[Funcanno_flgs['MetaLR_score']],cls[Funcanno_flgs['MutationAssessor_score']]
                     
                 if re.findall('true',paras['otherinfo'], flags=re.IGNORECASE)  :
-                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']],cls[Freqs_flgs['gnomAD_genome_ALL']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phastCons20way_mammalian']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['MetaSVM_score']],Freq_gnomAD_genome_POPs,OMIM,Pheno_MIM,orpha,orpha_details,pathway,Therap_list,Diag_list,Prog_list,cls[Funcanno_flgs['Polyphen2_HDIV_score']],cls[Funcanno_flgs['FATHMM_score']],cls[Funcanno_flgs['MetaLR_score']],cls[Funcanno_flgs['MutationAssessor_score']],cls[Funcanno_flgs['Otherinfo']]     ))
+                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']],cls[Freqs_flgs['gnomAD_genome_ALL']], cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phastCons20way_mammalian']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['MetaSVM_score']],Freq_gnomAD_genome_POPs,OMIM,Pheno_MIM,orpha,orpha_details,pathway,Therap_list,Diag_list,Prog_list,cls[Funcanno_flgs['Polyphen2_HDIV_score']],cls[Funcanno_flgs['FATHMM_score']],cls[Funcanno_flgs['MetaLR_score']],cls[Funcanno_flgs['MutationAssessor_score']],cls[Funcanno_flgs['cosmic91']],cls[Funcanno_flgs['ICGC_Id']],cls[Funcanno_flgs['Otherinfo']]     ))
                 else:
-                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Freqs_flgs['gnomAD_genome_ALL']],cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phastCons20way_mammalian']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['MetaSVM_score']],Freq_gnomAD_genome_POPs,OMIM,Pheno_MIM,orpha,orpha_details,pathway,Therap_list,Diag_list,Prog_list,cls[Funcanno_flgs['Polyphen2_HDIV_score']],cls[Funcanno_flgs['FATHMM_score']],cls[Funcanno_flgs['MetaLR_score']],cls[Funcanno_flgs['MutationAssessor_score']]   ))
+                    fw.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\tclinvar: %s \t CancerVar: %s \t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (cls[Allels_flgs['Chr']],cls[Allels_flgs['Start']],cls[Allels_flgs['End']],cls[Allels_flgs['Ref']],cls[Allels_flgs['Alt']],cls[Funcanno_flgs['Gene']],cls[Funcanno_flgs['Func.refGene']],cls[Funcanno_flgs['ExonicFunc.refGene']], cls[Funcanno_flgs['Gene.ensGene']],cls[Funcanno_flgs['avsnp147']],cls[Funcanno_flgs['AAChange.ensGene']],cls[Funcanno_flgs['AAChange.refGene']],clinvar_bp,cancervar_bp,cls[Freqs_flgs['ExAC_ALL']], cls[Freqs_flgs['esp6500siv2_all']], cls[Freqs_flgs['1000g2015aug_all']], cls[Freqs_flgs['gnomAD_genome_ALL']],cls[Funcanno_flgs['CADD_raw']],cls[Funcanno_flgs['CADD_phred']],cls[Funcanno_flgs['SIFT_score']],  cls[Funcanno_flgs['GERP++_RS']],cls[Funcanno_flgs['phastCons20way_mammalian']], cls[Funcanno_flgs['dbscSNV_ADA_SCORE']], cls[Funcanno_flgs['dbscSNV_RF_SCORE']], cls[Funcanno_flgs['Interpro_domain']],cls[Funcanno_flgs['AAChange.knownGene']],cls[Funcanno_flgs['MetaSVM_score']],Freq_gnomAD_genome_POPs,OMIM,Pheno_MIM,orpha,orpha_details,pathway,Therap_list,Diag_list,Prog_list,cls[Funcanno_flgs['Polyphen2_HDIV_score']],cls[Funcanno_flgs['FATHMM_score']],cls[Funcanno_flgs['MetaLR_score']],cls[Funcanno_flgs['MutationAssessor_score']],cls[Funcanno_flgs['cosmic91']],cls[Funcanno_flgs['ICGC_Id']]   ))
                 #print("%s\t%s %s" % (line,clinvar_bp,cancervar_bp))
 
             line_sum=line_sum+1
