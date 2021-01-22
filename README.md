@@ -14,8 +14,8 @@ CanverVar is a python script for cancer variant interpretation of clinical signi
 1. You need install Python >=2.6.6.
 2. You need install [ANNOVAR](http://annovar.openbioinformatics.org/en/latest/) version >=  2016-02-01.
 3. You need download other files such as mim2gene.txt from [OMIM](http://www.omim.org/downloads).
-4. Please use the updated files(should be generated: >= 2016-09), outdated files will bring problems of InterVar.
-5. Some Updated datasets for Annovar:  [https://cancervar.wglab.org/databases/](https://cancervar.wglab.org/databases/) (download and gunzip in the Annovar db folder)
+4. Please use the updated files(should be generated: >= 2016-09), outdated files will bring problems of CancerVar.
+5. Some updated datasets(cosmic and icgc) for Annovar:  [https://cancervar.wglab.org/databases/](https://cancervar.wglab.org/databases/) (download and gunzip, put in the Annovar db folder)
 
 
 ## OPTIONS
