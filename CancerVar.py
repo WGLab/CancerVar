@@ -25,9 +25,8 @@ Written by Quan LI,leequan@gmail.com.
 .%%..%%..%%..%%..%%..%%..%%..%%..%%......%%..%%...%%%%...%%..%%..%%..%%.
 ..%%%%...%%..%%..%%..%%...%%%%...%%%%%%..%%..%%....%%....%%..%%..%%..%%.
 ........................................................................
-      New datasets downloading: 
+      New datasets downloading:
   https://cancervar.wglab.org/databases/
-
 """
 
 usage = """Usage: %prog [OPTION] -i  INPUT -o  OUTPUT ...
@@ -45,9 +44,8 @@ Interpretation of Pathogenic/Benign for cancer variants (v.1.1)
 .%%..%%..%%..%%..%%..%%..%%..%%..%%......%%..%%...%%%%...%%..%%..%%..%%.
 ..%%%%...%%..%%..%%..%%...%%%%...%%%%%%..%%..%%....%%....%%..%%..%%..%%.
 ........................................................................
-     New datasets downloading:
-https://cancervar.wglab.org/databases/
-
+      New datasets downloading:
+  https://cancervar.wglab.org/databases/
 """
 end = """=============================================================================
 ........................................................................
@@ -58,7 +56,7 @@ end = """=======================================================================
 ..%%%%...%%..%%..%%..%%...%%%%...%%%%%%..%%..%%....%%....%%..%%..%%..%%.
 ........................................................................
       New datasets downloading:
- https://cancervar.wglab.org/databases/
+  https://cancervar.wglab.org/databases/
 Thanks for using CancerVar!
 Report bugs to leequan@gmail.com;
 CancerVar homepage: <https://CancerVar.wglab.org>
@@ -690,6 +688,7 @@ def sum_of_list(list):
     return(sum)
 
 def classfy(CBP,Allels_flgs,cls):
+    #BPS=["Pathogenic","Likely_pathogenic","Benign/Likely_benign","Uncertain_significance"]
     BPS=["Tier_I_strong","Tier_II_potential","Tier_IV_benign","Tier_III_Uncertain"]
     PAS_out=-1
     BES_out=-1
@@ -1573,6 +1572,10 @@ def search_key_index(line,dict):
             if key==cls[ii]:
                 dict[key]=ii
                 break
+            if key=="Otherinfo":
+                if cls[ii]==key or cls[ii]=="Otherinfo1":
+                    dict[key]=ii
+                    break
     return
 
 def my_inter_var_can(annovar_outfile):
