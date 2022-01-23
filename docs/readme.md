@@ -10,7 +10,7 @@ CancerVar is a bioinformatics software tool for clinical interpretation of somat
 
 ## OPAI
 
-OPAI is a python script for oncogenic prioritization by artificial intelligence (OPAI). Using deep learning-based approach, OPAI provides probability score  to determine the oncogenicity of a variant, using 12 clinical evidence features from CancerVar and 19 functional features with scoring metrics predicted by computational tools.
+OPAI is a python script for oncogenic prioritization by artificial intelligence (OPAI). Based on deep learning-based approach, OPAI predict the oncogenicity of a variant, using 12 clinical evidence features from CancerVar and 19 in silico functional features with scoring metrics predicted by computational tools.
 
 ## Pipeline
 
