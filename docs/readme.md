@@ -18,6 +18,8 @@ OPAI is a python script for oncogenic prioritization by artificial intelligence 
 
 ---
 
+![new](img/new.png) 2019Dec: The OPAI is online now [here](http://cancervar.wglab.org).
+
 ![new](img/new.png) 2018Nov: The web server of CancerVar is  online now [here](http://cancervar.wglab.org).
 
 ![new](img/new.png) 2018Jan: The GitHub repository for CancerVar is created.
@@ -26,7 +28,8 @@ OPAI is a python script for oncogenic prioritization by artificial intelligence 
 
 ## Reference
 
-- Quan Li, Zilin Ren, Kajia Cao, Marilyn M. Li, Yunyun Zhou and Kai Wang. CancerVar: an Artificial Intelligence empowered platform for clinical interpretation of somatic mutations in cancer.
+- Quan Li, Zilin Ren, Kajia Cao, Marilyn M. Li, Yunyun Zhou and Kai Wang. CancerVar: an Artificial Intelligence empowered platform for clinical interpretation of somatic mutations in cancer. (Under Review,2022)[BioRxiv](https://doi.org/10.1101/2020.10.06.323162)
+
 
 - Li MM, Datto M, Duncavage EJ, Kulkarni S, Lindeman NI, Roy S, Tsimberidou AM, Vnencak-Jones CL, Wolff DJ, Younes A, Nikiforova MN. Standards and Guidelines for the Interpretation and Reporting of Sequence Variants in Cancer: A Joint Consensus Recommendation of the Association for Molecular Pathology, American Society of Clinical Oncology, and College of American Pathologists.
 
