@@ -104,7 +104,6 @@ The OPAI scripts are in the **scripts** folder of **“OPAI”**:
    - predicting the oncogenicity of a variant.
 
 
-
 #### PREREQUISITE
 OPAI has currently only been tested with **Python 3.6+**, and requires four Python modules to be installed and in path. These are **numpy** https://numpy.org, **pandas** https://pandas.pydata.org , **scikit-learn** https://scikit-learn.org and **pytorch** https://pytorch.org. 
 
@@ -213,7 +212,7 @@ The web server provided pre-compiled 13M mutations annotation results and OPAI s
 
 ## LICENSE
 
-CancerVar and OPAI is free for non-commercial use without warranty. Users need to obtain licenses such as OMIM and ANNOVAR by themselves. Please contact the authors for commercial use.
+CancerVar and OPAI is free for non-commercial use without warranty. Users need to obtain licenses such as ANNOVAR by themselves. Please contact the authors for commercial use.
 
 ## REFERENCE
 
