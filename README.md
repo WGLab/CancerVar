@@ -6,7 +6,7 @@ Clinical interpretation of Cancer somatic Variants(CancerVar) and Oncogenic Prio
 CancerVar takes either pre-annotated files, or unannotated input files in VCF format or ANNOVAR input format, where each line corresponds to one genetic variant; CancerVar will call ANNOVAR to generate necessary annotations.
 In the output, based on all 12 pieces of evidence, each variant will be assigned as "Tier_I_strong", "Tier_II_potential", "Tier_IV_benign" and "Tier_III_Uncertain" by rules specified in the AMP/ASCO/CAP 2017 guidelines.
 
-OPAI takes 12 clinical evidence prediction scores from CancerVar and 23 pre-computed in silico scores predicted by other computational tools as input from ANNOVAR, and predicts oncogenicity scores by a semi-supervised deep-learning model.
+OPAI takes 12 clinical evidence scores from CancerVar and 23 pre-computed in silico scores predicted by other computational tools as input from ANNOVAR, and predicts oncogenicity scores by a semi-supervised deep-learning model.
 
 CanverVar and OPAI are Python based scripts. The user need to run CancerVar firstly as **step 1** to get clinical evidence-based interpretation results and then run OPAI as **step 2** if they want to get the deep-learning model-based prediction results.
 
@@ -121,10 +121,10 @@ There are two ways to install these modules:
 #### MODELS
  There are two trained models for prediction in OPAI, located in the folder of **"saves"**:
 - Ensemble-based model: 
-   - both clinical evidence prediction scores and 23 pre-computed in silico scores are taken as input of the model;
+   - both clinical evidence score and 23 pre-computed in silico scores are taken as input of the model;
    - model file: `ensemble.pt`
 - Evidence-based model: 
-    - only clinical evidence prediction scores are taken as input of the model, this is useful for case of a lot or even all the missing values in 23 pre-computed in silico scores.
+    - only clinical evidence score are taken as input of the model, this is useful for case of a lot or even all the missing values in 23 pre-computed in silico scores.
     -  model file: `evs.pt`
 
  Users can specify the model by using the `-m ensemble ` or `-m evs` option and then following the `-d model_file_location` option.
