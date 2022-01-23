@@ -136,20 +136,20 @@ There are two ways to install these modules:
 
  - using Ensemble-based model
 ```
-   python3.6 OPAI/scripts/feature_preprocess.py -a example/FDA.hg19_multianno.txt.grl_p -c  example/FDA.hg19_multianno.txt.cancervar -m ensemble -n 5 -d OPAI/saves/nonmissing_db.npy -o example/FDA_hg19.hg19_multianno.txt.cancervar.ensemble.csv
+   python3.6 OPAI/scripts/feature_preprocess.py -a example/FDA.hg19_multianno.txt.grl_p -c  example/FDA.hg19_multianno.txt.cancervar -m ensemble -n 5 -d OPAI/saves/nonmissing_db.npy -o example/FDA.hg19_multianno.txt.cancervar.ensemble.csv
             
-   python3.6 OPAI/scripts/opai_predictor.py -i  example/FDA_hg19.hg19_multianno.txt.cancervar.ensemble.csv -m ensemble -c OPAI/saves/ensemble.pt -d cpu -v example/FDA.hg19_multianno.txt.cancervar -o example/FDA_hg19.hg19_multianno.txt.cancervar.ensemble.pred
+   python3.6 OPAI/scripts/opai_predictor.py -i  example/FDA.hg19_multianno.txt.cancervar.ensemble.csv -m ensemble -c OPAI/saves/ensemble.pt -d cpu -v example/FDA.hg19_multianno.txt.cancervar -o example/FDA.hg19_multianno.txt.cancervar.ensemble.pred
 ```
-The predicted oncogenicity are in the (last)column of **"ensemble_score"** in file `example/FDA_hg19.hg19_multianno.txt.cancervar.ensemble.pred`.
+The predicted oncogenicity are in the (last)column of **"ensemble_score"** in file `example/FDA.hg19_multianno.txt.cancervar.ensemble.pred`.
 
 - using Evidence-based model
 ```
-   python3.6 OPAI/scripts/feature_preprocess.py -a example/FDA.hg19_multianno.txt.grl_p -c  example/FDA.hg19_multianno.txt.cancervar -m evs -n 5 -d OPAI/saves/nonmissing_db.npy -o example/FDA_hg19.hg19_multianno.txt.cancervar.evs.csv
+   python3.6 OPAI/scripts/feature_preprocess.py -a example/FDA.hg19_multianno.txt.grl_p -c  example/FDA.hg19_multianno.txt.cancervar -m evs -n 5 -d OPAI/saves/nonmissing_db.npy -o example/FDA.hg19_multianno.txt.cancervar.evs.csv
             
-   python3.6 OPAI/scripts/opai_predictor.py -i  example/FDA_hg19.hg19_multianno.txt.cancervar.evs.csv -m evs -c OPAI/saves/evs.pt -d cpu -v example/FDA.hg19_multianno.txt.cancervar -o example/FDA_hg19.hg19_multianno.txt.cancervar.evs.pred
+   python3.6 OPAI/scripts/opai_predictor.py -i  example/FDA.hg19_multianno.txt.cancervar.evs.csv -m evs -c OPAI/saves/evs.pt -d cpu -v example/FDA.hg19_multianno.txt.cancervar -o example/FDA.hg19_multianno.txt.cancervar.evs.pred
 
 ```
-The predicted oncogenicity are in the (last)column of **"evs_score"** in file `example/FDA_hg19.hg19_multianno.txt.cancervar.evs.pred`.
+The predicted oncogenicity are in the (last)column of **"evs_score"** in file `example/FDA.hg19_multianno.txt.cancervar.evs.pred`.
  
 #### OPTIONS OF OPAI SCRIPTS 
 - Feature process using `feature_preprocess.py`
