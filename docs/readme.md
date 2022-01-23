@@ -1,4 +1,4 @@
-# CancerVar & OPAI
+# CancerVar & OPAI detailed document
 
 ## CancerVar
 
