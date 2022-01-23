@@ -6,9 +6,9 @@ Clinical interpretation of Cancer somatic Variants(CancerVar) and Oncogenic Prio
 CancerVar takes either pre-annotated files, or unannotated input files in VCF format or ANNOVAR input format, where each line corresponds to one genetic variant; CancerVar will call ANNOVAR to generate necessary annotations.
 In the output, based on all 12 pieces of evidence, each variant will be assigned as "Tier_I_strong", "Tier_II_potential", "Tier_IV_benign" and "Tier_III_Uncertain" by rules specified in the AMP/ASCO/CAP 2017 guidelines.
 
-OPAI takes 12 clinical evidence scores from CancerVar and 23 pre-computed in silico scores predicted by other computational tools as input from ANNOVAR, and predicts oncogenicity scores by a semi-supervised deep-learning model.
+OPAI takes 12 clinical evidence scores from CancerVar and 23 pre-computed in silico scores predicted by other computational tools from ANNOVAR as input, and predicts oncogenicity by a semi-supervised deep-learning model.
 
-CanverVar and OPAI are Python based scripts. The user need to run CancerVar firstly as **step 1** to get clinical evidence-based interpretation results and then run OPAI as **step 2** if they want to get the deep-learning model-based prediction results.
+CanverVar and OPAI are Python based scripts. The user need to run CancerVar firstly as **step 1** to get clinical evidence-based interpretation results and then run OPAI as **step 2** if they want to get the deep-learning model-based oncogenicity prediction.
 
 ## CancerVar(step 1)
 
@@ -49,8 +49,9 @@ input file of  variants for analysis
 The input file type, it can be  AVinput(Annovar''sformat),VCF
 
 - --cancer_type=CANCER
-The cancer type, please check the help for the details of cancer type
-
+The cancer type, please check the help for the details of cancer type: Adrenal_Gland Bile_Duct Bladder Blood Bone Bone_Marrow Brain Breast Cancer_all Cervix
+Colorectal Esophagus Eye Head_and_Neck Inflammatory Intrahepatic Kidney Liver Lung Lymph_Nodes Nervous_System Other Ovary Pancreas Pleura Prostate
+ Skin Soft_Tissue Stomach Testis Thymus Thyroid Uterus,if you are using avinput file, you can can specify the cancer type in the 6th column
 
 - -o OUTPUTFILE, --output=OUTPUTFILE
 prefix the output file (default:output)
@@ -58,8 +59,14 @@ prefix the output file (default:output)
 - -b BUILDVER, --buildver=BUILDVER
 version of reference genome: hg38, hg19(default)
 
+  CancerVar Other Options:
 - -t cancervardb, --database_intervar=cancervardb
 The database location/dir for the CancerVar dataset files
+
+- -s your_evidence_file, --evidence_file=your_evidence_file
+User specified Evidence file for each variant
+
+  Annovar Options( check these options from manual of Annovar):
 
 - --table_annovar=./table_annovar.pl
 The Annovar perl script of table_annovar.pl
