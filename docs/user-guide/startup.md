@@ -13,9 +13,11 @@ For beginners, the easiest way to use CancerVar is to annotate a VCF file by ANN
 
 ### EXAMPLE OF CANCERVAR
 
-    ./CancerVar.py -c config.ini  # Run the examples in config.ini
+    python3.6 ./CancerVar.py -c config.ini  # Run the examples in config.ini
 
-    ./CancerVar.py  -b hg19 -i your_input  --input_type=VCF  -o your_output
+    python3.6 ./CancerVar.py  -b hg19 -i your_input  --input_type=VCF  -o your_output
+    
+    python3.6 ./CancerVar.py -b hg19 -i example/FDA_hg19.av -o example/FDA
 
 
 ## Quick guide to OPAI
