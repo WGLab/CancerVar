@@ -122,10 +122,10 @@ There are two ways to install these modules:
  There are two trained models for prediction in OPAI, located in the folder of **"saves"**:
 - Ensemble-based model: 
    - both clinical evidence prediction scores and 23 pre-computed in silico scores are taken as input of the model;
-   - file: `ensemble.pt`
+   - model file: `ensemble.pt`
 - Evidence-based model: 
     - only clinical evidence prediction scores are taken as input of the model, this is useful for case of a lot or even all the missing values in 23 pre-computed in silico scores.
-    -  file: `evs.pt`
+    -  model file: `evs.pt`
 
  Users can specify the model by using the `-m ensemble ` or `-m evs` option and then following the `-d model_file_location` option.
  
