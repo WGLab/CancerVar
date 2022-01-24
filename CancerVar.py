@@ -58,6 +58,10 @@ end = """=======================================================================
       New datasets downloading:
   https://cancervar.wglab.org/databases/
 Thanks for using CancerVar!
+
+Need OPAI(Oncogenic Prioritization by Artificial Intelligence)?
+Please check https://github.com/WGLab/CancerVar
+
 Report bugs to leequan@gmail.com;
 CancerVar homepage: <https://CancerVar.wglab.org>
 =============================================================================
@@ -1742,7 +1746,7 @@ def main():
         sys.exit()
 
     print("%s" %description)
-    print("%s" %version)
+#    print("%s" %version)
     print("Notice: Your command of CancerVar is %s" % sys.argv[:])
 
 
