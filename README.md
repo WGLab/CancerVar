@@ -95,7 +95,7 @@ After running CancerVar correclty and getting the output files of **"*.cancervar
 ### WHAT AND HOW DOES IT DO
 
 OPAI is a python script for Oncogenic Prioritization by Artificial Intelligence after CancerVar.
-OPAI firstly call **feature_preprocess.py** to process the features coding from CancerVar and Annovar output, then call **opai_predictor.py** to precit the oncogenicity.
+OPAI firstly call **feature_preprocess.py** to process the features coding from CancerVar and Annovar output, then call **opai_predictor.py** to predict the oncogenicity.
 
 The OPAI scripts are in the **scripts** folder of **“OPAI”**:
 - feature_preprocess.py: 
