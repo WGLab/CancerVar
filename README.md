@@ -227,7 +227,7 @@ Li MM, Datto M, Duncavage EJ, Kulkarni S, Lindeman NI, Roy S, Tsimberidou AM, Vn
 Standards and Guidelines for the Interpretation and Reporting of Sequence Variants in Cancer: A Joint Consensus Recommendation of the Association for Molecular Pathology, American Society of Clinical Oncology, and College of American Pathologists.
 
 [The  ACMG/CGC 2019 guidelines ](https://www.ncbi.nlm.nih.gov/pubmed/31138931)
-2.Mikhail FM, et al. Technical laboratory standards for interpretation and reporting of acquired copy-number abnormalities and copy-neutral loss of heterozygosity in neoplastic disorders: a joint consensus recommendation from the American College of Medical Genetics and Genomics (ACMG) and the Cancer Genomics Consortium (CGC). Genet Med. 2019 Sep;21(9):1903-1916. doi: 10.1038/s41436-019-0545-7.
+Mikhail FM, et al. Technical laboratory standards for interpretation and reporting of acquired copy-number abnormalities and copy-neutral loss of heterozygosity in neoplastic disorders: a joint consensus recommendation from the American College of Medical Genetics and Genomics (ACMG) and the Cancer Genomics Consortium (CGC). Genet Med. 2019 Sep;21(9):1903-1916. doi: 10.1038/s41436-019-0545-7.
 
 
 ## Acknowledges
