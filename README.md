@@ -1,5 +1,5 @@
 # CancerVar & OPAI
-Clinical interpretation of Cancer somatic Variants(CancerVar) and Oncogenic Prioritization by Artificial Intelligence(OPAI)
+Clinical interpretation of Cancer somatic Variants (CancerVar) and Oncogenic Prioritization by Artificial Intelligence (OPAI)
 
 ## HOW DOES IT WORK
 
@@ -25,7 +25,7 @@ CanverVar is a python script for cancer variant interpretation of clinical signi
 1. You need install **Python >=3.6**
 2. You need install **[ANNOVAR]**(http://annovar.openbioinformatics.org/en/latest/) version >=  2016-02-01.
 3. Most of the datases can be downloaded automatically.
-4. Some updated datasets(c**osmic and icgc**) for Annovar:  [https://cancervar.wglab.org/databases/](https://cancervar.wglab.org/databases/) (download and gunzip, put in the Annovar db folder)
+4. Some updated datasets(**cosmic and icgc**) for Annovar:  [https://cancervar.wglab.org/databases/](https://cancervar.wglab.org/databases/) (download and gunzip, put in the Annovar db folder)
 5. Please use the updated files, outdated files will bring some problems of running CancerVar.
 
 
@@ -87,10 +87,11 @@ The database location/dir for the Annovar annotation datasets
     python3.6 ./CancerVar.py  -b hg19 -i your_input  --input_type=VCF  -o your_output
     python3.6 ./CancerVar.py  -b hg19 -i example/FDA_hg19.av -o example/FDA
 ```
+The clinical interpretation results are in the ouput file of **"*.cancervar"**,  the column of **"CancerVar: CancerVar and Evidence"** is the evidence and final interpretation.
 
 ## OPAI(step 2)
 
-After running CancerVar correclty and getting the output files of **"*.cancervar"** and **"*.grl_p"**,we are ready to run Oncogenic Prioritization by Artificial Intelligenc.
+After running CancerVar correctly and getting the output files of **"*.cancervar"** and **"*.grl_p"**,we are ready to run Oncogenic Prioritization by Artificial Intelligence.
 
 ### WHAT AND HOW DOES IT DO
 
@@ -207,8 +208,9 @@ optional arguments:
  
  
 ## Web server
-CancerVar:  [http://cancervar.wglab.org](http://cancervar.wglab.org)
-The web server provided pre-compiled 13M mutations annotation results and OPAI scores.
+We also developed a web server [http://cancervar.wglab.org](http://cancervar.wglab.org), which offers a graphical user interface for CancerVar and OPAI scores. 
+
+This web server provided pre-compiled 13M mutations annotation results and OPAI scores. Users can directly search their exonic variants by chromosomal position, by dbSNP identifier, or by gene name with the nucleic acid/amino acid change. The web server will provide full details on the variants, including all automatically generated criteria, most of the supportive evidence and also OPAI scores.
 
 ## LICENSE
 
@@ -225,10 +227,8 @@ Li MM, Datto M, Duncavage EJ, Kulkarni S, Lindeman NI, Roy S, Tsimberidou AM, Vn
 Standards and Guidelines for the Interpretation and Reporting of Sequence Variants in Cancer: A Joint Consensus Recommendation of the Association for Molecular Pathology, American Society of Clinical Oncology, and College of American Pathologists.
 
 [The  ACMG/CGC 2019 guidelines ](https://www.ncbi.nlm.nih.gov/pubmed/31138931)
-2.Mikhail FM, et al. Technical laboratory standards for interpretation and reporting of acquired copy-number abnormalities and copy-neutral loss of heterozygosity in neoplastic disorders: a joint consensus recommendation from the American College of Medical Genetics and Genomics (ACMG) and the Cancer Genomics Consortium (CGC). Genet Med. 2019 Sep;21(9):1903-1916. doi: 10.1038/s41436-019-0545-7.
+Mikhail FM, et al. Technical laboratory standards for interpretation and reporting of acquired copy-number abnormalities and copy-neutral loss of heterozygosity in neoplastic disorders: a joint consensus recommendation from the American College of Medical Genetics and Genomics (ACMG) and the Cancer Genomics Consortium (CGC). Genet Med. 2019 Sep;21(9):1903-1916. doi: 10.1038/s41436-019-0545-7.
 
-[The ACMG 2015 guide](http://www.ncbi.nlm.nih.gov/pubmed/25741868)
-Richards, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genetics in medicine : official journal of the American College of Medical Genetics 17, 405-424 (2015).
 
 ## Acknowledges
 
