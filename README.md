@@ -1,5 +1,5 @@
 # CancerVar & OPAI
-Clinical interpretation of Cancer somatic Variants(CancerVar) and Oncogenic Prioritization by Artificial Intelligence(OPAI)
+Clinical interpretation of Cancer somatic Variants (CancerVar) and Oncogenic Prioritization by Artificial Intelligence (OPAI)
 
 ## HOW DOES IT WORK
 
@@ -90,7 +90,7 @@ The database location/dir for the Annovar annotation datasets
 
 ## OPAI(step 2)
 
-After running CancerVar correclty and getting the output files of **"*.cancervar"** and **"*.grl_p"**,we are ready to run Oncogenic Prioritization by Artificial Intelligenc.
+After running CancerVar correctly and getting the output files of **"*.cancervar"** and **"*.grl_p"**,we are ready to run Oncogenic Prioritization by Artificial Intelligence.
 
 ### WHAT AND HOW DOES IT DO
 
@@ -208,6 +208,7 @@ optional arguments:
  
 ## Web server
 CancerVar:  [http://cancervar.wglab.org](http://cancervar.wglab.org)
+
 The web server provided pre-compiled 13M mutations annotation results and OPAI scores.
 
 ## LICENSE
