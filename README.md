@@ -25,7 +25,7 @@ CanverVar is a python script for cancer variant interpretation of clinical signi
 1. You need install **Python >=3.6**
 2. You need install **[ANNOVAR]**(http://annovar.openbioinformatics.org/en/latest/) version >=  2016-02-01.
 3. Most of the datases can be downloaded automatically.
-4. Some updated datasets(c**osmic and icgc**) for Annovar:  [https://cancervar.wglab.org/databases/](https://cancervar.wglab.org/databases/) (download and gunzip, put in the Annovar db folder)
+4. Some updated datasets(**cosmic and icgc**) for Annovar:  [https://cancervar.wglab.org/databases/](https://cancervar.wglab.org/databases/) (download and gunzip, put in the Annovar db folder)
 5. Please use the updated files, outdated files will bring some problems of running CancerVar.
 
 
@@ -87,6 +87,7 @@ The database location/dir for the Annovar annotation datasets
     python3.6 ./CancerVar.py  -b hg19 -i your_input  --input_type=VCF  -o your_output
     python3.6 ./CancerVar.py  -b hg19 -i example/FDA_hg19.av -o example/FDA
 ```
+The clinical interpretation results are in the ouput file of **"*.cancervar"**,  the column of **"CancerVar: CancerVar and Evidence"** is the evidence and final interpretation.
 
 ## OPAI(step 2)
 
@@ -207,9 +208,9 @@ optional arguments:
  
  
 ## Web server
-CancerVar:  [http://cancervar.wglab.org](http://cancervar.wglab.org)
+We also developed a web server [http://cancervar.wglab.org](http://cancervar.wglab.org), which offers a graphical user interface for CancerVar and OPAI scores. 
 
-The web server provided pre-compiled 13M mutations annotation results and OPAI scores.
+This web server provided pre-compiled 13M mutations annotation results and OPAI scores. Users can directly search their exonic variants by chromosomal position, by dbSNP identifier, or by gene name with the nucleic acid/amino acid change. The web server will provide full details on the variants, including all automatically generated criteria, most of the supportive evidence and also OPAI scores.
 
 ## LICENSE
 
