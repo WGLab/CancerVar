@@ -228,8 +228,6 @@ Standards and Guidelines for the Interpretation and Reporting of Sequence Varian
 [The  ACMG/CGC 2019 guidelines ](https://www.ncbi.nlm.nih.gov/pubmed/31138931)
 2.Mikhail FM, et al. Technical laboratory standards for interpretation and reporting of acquired copy-number abnormalities and copy-neutral loss of heterozygosity in neoplastic disorders: a joint consensus recommendation from the American College of Medical Genetics and Genomics (ACMG) and the Cancer Genomics Consortium (CGC). Genet Med. 2019 Sep;21(9):1903-1916. doi: 10.1038/s41436-019-0545-7.
 
-[The ACMG 2015 guide](http://www.ncbi.nlm.nih.gov/pubmed/25741868)
-Richards, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genetics in medicine : official journal of the American College of Medical Genetics 17, 405-424 (2015).
 
 ## Acknowledges
 
