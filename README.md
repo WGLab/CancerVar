@@ -123,7 +123,7 @@ There are two ways to install these modules:
     python3.6 -m pip install numpy --user
     python3.6 -m pip install pandas --user
     python3.6 -m pip install scikit-learn --user
-    python3.6 -m pip install pytorch --user
+    python3.6 -m pip install torch --user
 ``` 
 #### MODELS
  There are two trained models for prediction in OPAI, located in the folder of **"saves"**:
