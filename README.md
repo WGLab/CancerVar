@@ -218,7 +218,7 @@ CancerVar and OPAI is free for non-commercial use without warranty. Users need t
 
 ## REFERENCE
 
-Quan Li, Zilin Ren, Kajia Cao, Marilyn M. Li, Yunyun Zhou and Kai Wang. CancerVar: an Artificial Intelligence empowered platform for clinical interpretation of somatic mutations in cancer.(Under Review,2022)[BioRxiv](https://doi.org/10.1101/2020.10.06.323162)
+Quan Li, Zilin Ren, Kajia Cao, Marilyn M. Li, Yunyun Zhou and Kai Wang. CancerVar: an Artificial Intelligence empowered platform for clinical interpretation of somatic mutations in cancer ( Science Advances, 2022, [https://www.science.org/doi/10.1126/sciadv.abj1624](https://www.science.org/doi/10.1126/sciadv.abj1624) )
 
 Quan Li and Kai Wang. InterVar: Clinical interpretation of genetic variants by ACMG-AMP 2015 guideline. The American Journal of Human Genetics 100, 1-14, February 2, 2017,[http://dx.doi.org/10.1016/j.ajhg.2017.01.004](http://dx.doi.org/10.1016/j.ajhg.2017.01.004)
 
