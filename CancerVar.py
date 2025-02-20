@@ -58,11 +58,11 @@ end = """=======================================================================
       New datasets downloading:
   https://cancervar.wglab.org/databases/
 Thanks for using CancerVar!
+Report bugs to leequan@gmail.com;
 
 Need OPAI(Oncogenic Prioritization by Artificial Intelligence)?
 Please check https://github.com/WGLab/CancerVar
 
-Report bugs to leequan@gmail.com;
 CancerVar homepage: <https://CancerVar.wglab.org>
 =============================================================================
 """
@@ -1746,7 +1746,7 @@ def main():
         sys.exit()
 
     print("%s" %description)
-#    print("%s" %version)
+    #print("%s" %version)
     print("Notice: Your command of CancerVar is %s" % sys.argv[:])
 
 
@@ -1790,19 +1790,20 @@ def main():
         paras['cancer_type']=options.cancer_type
     if options.database_cancervar != None:
         paras['database_cancervar']=options.database_cancervar
-        paras['lof_genes'] = paras['database_cancervar']+'/PVS1.LOF.genes'
+        paras['lof_genes'] = paras['database_cancervar']+'/LOF.genes.exac_me_cancers'
         paras['mim2gene'] =paras['database_cancervar']+'/mim2gene.txt'
         paras['mim_pheno'] = paras['database_cancervar']+'/mim_pheno.txt'
         paras['mim_orpha'] = paras['database_cancervar']+'/mim_orpha.txt'
         paras['orpha'] = paras['database_cancervar']+'/orpha.txt'
         paras['knowngenecanonical'] = paras['database_cancervar']+'/knownGeneCanonical.txt'
         paras['exclude_snps'] = paras['database_cancervar']+'/ext.variants'
-        paras['cancer_pathway'] =paras['database_cancervar']+'/cancer_pathway.list'
-        paras['cancers_genes'] =paras['database_cancervar']+'/cancers_genes.list'
+        paras['cancer_pathway'] =paras['database_cancervar']+'/cancers_genes.list_kegg.txt'
+        paras['cancers_genes'] =paras['database_cancervar']+'/cancer_census.genes'
         paras['cancers_types']=paras['database_cancervar']+'/cancervar.cancer.types'
 
 
     paras['exclude_snps'] = paras['exclude_snps']+'.'+paras['buildver']
+    paras['knowngenecanonical'] = paras['knowngenecanonical']+'.'+paras['buildver']
 
     if options.table_annovar != None:
         if os.path.isfile(options.table_annovar):
